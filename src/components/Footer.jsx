@@ -3,9 +3,18 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
+// Colors for travel-themed vibe
+const colors = {
+  background: '#f0f4f3',
+  text: '#2c3e50',
+  link: '#1abc9c',
+  hover: '#16a085',
+  border: '#dcdcdc',
+};
+
 // Styled Components
 const FooterContainer = styled.div`
-  background-color: #242424;
+  background-color: ${colors.background};
   padding: 4rem 0 2rem 0;
   display: flex;
   flex-direction: column;
@@ -14,27 +23,25 @@ const FooterContainer = styled.div`
 `;
 
 const FooterSubscription = styled.section`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
-  margin-bottom: 12px;
-  padding: 12px;
-  color: #fff;
+  color: ${colors.text};
+  margin-bottom: 2rem;
+  padding: 0 1rem;
 
   p {
-    font-family: 'Trebuchet MS', sans-serif;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0.5rem 0;
   }
 `;
 
 const SubscriptionHeading = styled.p`
-  margin-bottom: 12px;
-  font-size: 24px;
+  font-size: 1.8rem;
+  font-weight: 600;
 `;
 
 const SubscriptionText = styled.p`
-  margin-bottom: 12px;
-  font-size: 20px;
+  font-size: 1.2rem;
+  color: #555;
 `;
 
 const InputArea = styled.div`
@@ -45,38 +52,36 @@ const InputArea = styled.div`
   }
 
   input {
-    padding: 8px 20px;
-    border-radius: 2px;
-    margin: 4px 0 10px 0;
-    outline: none;
-    border: 1px solid #fff;
-    font-size: 18px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid ${colors.border};
+    margin: 8px 0;
+    font-size: 1rem;
+    width: 250px;
+    max-width: 90%;
     ::placeholder {
-      color: #b1b1b1;
+      color: #999;
     }
   }
 
-  @media screen and (min-width: 820px) {
+  @media screen and (min-width: 768px) {
     form {
       flex-direction: row;
     }
 
     input {
-      margin-right: 10px;
-      margin-bottom: 0;
+      margin: 0 1rem 0 0;
     }
   }
 `;
 
 const FooterLinks = styled.div`
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-
-  @media screen and (max-width: 820px) {
-    padding-top: 2rem;
-  }
+  gap: 2rem;
 `;
 
 const FooterLinkWrapper = styled.div`
@@ -92,52 +97,52 @@ const FooterLinkItems = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin: 16px;
-  width: 160px;
+  min-width: 140px;
 
   h2 {
-    color: #fff;
-    margin-bottom: 16px;
+    color: ${colors.text};
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
   }
 
   a {
-    color: #fff;
+    color: ${colors.link};
     text-decoration: none;
     margin-bottom: 0.5rem;
+    font-size: 1rem;
+
     &:hover {
-      color: #e9e9e9;
-      transition: 0.3s ease-out;
+      color: ${colors.hover};
+      transition: 0.3s ease-in-out;
     }
   }
 `;
 
 const SocialMedia = styled.section`
-  max-width: 1000px;
   width: 100%;
+  max-width: 1100px;
+  margin-top: 2rem;
 `;
 
 const SocialMediaWrap = styled.div`
-  display: flex;
+   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 90%;
-  max-width: 1000px;
-  margin: 40px auto 0 auto;
+  flex-wrap: wrap;
+  padding: 1rem;
+  border-top: 1px solid ${colors.border};
 
   @media screen and (max-width: 820px) {
     flex-direction: column;
+    gap: 1rem;
   }
 `;
 
 const FooterLogo = styled(Link)`
-  color: #fff;
-  text-decoration: none;
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  margin-left: 20px;
-  margin-bottom: 16px;
-  cursor: pointer;
+  color: ${colors.text};
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-decoration: none;;
 
   i {
     margin-left: 5px;
@@ -146,8 +151,7 @@ const FooterLogo = styled(Link)`
 
 const WebsiteRights = styled.small`
   color: #fff;
-  font-size: 16px;
-  margin-bottom: 16px;
+  font-size: 0.9rem;
 `;
 
 const SocialIcons = styled.div`
@@ -158,8 +162,12 @@ const SocialIcons = styled.div`
 `;
 
 const SocialIconLink = styled(Link)`
-  color: #fff;
-  font-size: 24px;
+  color: ${colors.link};
+  font-size: 1.5rem;
+
+  &:hover {
+    color: ${colors.hover};
+  }
 `;
 
 function Footer() {
@@ -184,13 +192,6 @@ function Footer() {
         </FooterLinkWrapper>
         <FooterLinkWrapper>
           <FooterLinkItems>
-            <h2>About us</h2>
-            <Link to="#">How it works</Link>
-            <Link to="#">Our vision</Link>
-            <Link to="#">Who we are</Link>
-            <Link to="#">Support us</Link>
-          </FooterLinkItems>
-          <FooterLinkItems>
             <h2>Social media</h2>
             <Link to="#">Facebook</Link>
             <Link to="#">Instagram</Link>
@@ -210,11 +211,10 @@ function Footer() {
           </form>
         </InputArea>
       </FooterSubscription>
-
       <SocialMedia>
         <SocialMediaWrap>
           <FooterLogo to="/">
-            Close2Home <i className="fa-solid fa-shop" />
+            Triping <i className="fa-solid fa-shop" />
           </FooterLogo>
           <WebsiteRights>© 2025</WebsiteRights>
           <SocialIcons>

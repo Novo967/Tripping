@@ -41,9 +41,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/services' element={<PageWrapper><Services /></PageWrapper>} />
-        <Route path='/profile' element={<PageWrapper><Profile /></PageWrapper>} />
-        <Route path='/sign-up' element={<PageWrapper><SignUp /></PageWrapper>} />
+        <Route path='/services' element={<Services />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/sign-up' element={<SignUp />} />
         <Route path='/login' element={<LogingIn />} />
       </Routes>
       <Footer />

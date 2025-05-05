@@ -27,8 +27,8 @@ const StyledButton = styled.button`
     styleType === 'btn--outline' &&
     css`
       background-color: transparent;
-      color: #ffffff;
-      border: 1px solid #ffffff;
+      color:rgb(8, 8, 8);
+      border: 1px solid rgb(22, 4, 4);
       transition: all 0.3s ease-out;
     `}
 

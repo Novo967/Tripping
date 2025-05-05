@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const NavbarContainer = styled.nav`
-  background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%);
+  background-color:rgb(162, 235, 217);
   height: 80px;
   display: flex;
   justify-content: center;
@@ -112,6 +112,7 @@ const NavLink = styled(Link)`
 
 const MobileLink = styled(Link)`
   display: none;
+  color: #fff;
 
   @media screen and (max-width: 960px) {
     display: block;
@@ -129,7 +130,7 @@ const MobileLink = styled(Link)`
 
     &:hover {
       background: #fff;
-      color: #242424;
+      color:rgb(238, 224, 224);
       transition: 250ms;
     }
   }
@@ -173,7 +174,7 @@ function Navbar() {
       <NavbarContainer>
         <Container>
           <Logo to='/' onClick={closeMobileMenu}>
-            Close2Home
+            Triping
             <i className='fa-solid fa-shop' />
           </Logo>
 
