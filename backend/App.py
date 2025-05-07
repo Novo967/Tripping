@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 # Initialize app and config
 app = Flask(__name__)
-CORS(app, origins=["https://triping-ln965s0fa-novs-projects-c22b7ac3.vercel.app","http://localhost:3000", "https://4137-2a0d-6fc7-213-b38c-4085-28d1-ea2-2f26.ngrok-free.app", "http://localhost:5173"])
+CORS(app, origins=["https://triping-jusgzler1-novs-projects-c22b7ac3.vercel.app","http://localhost:3000", "https://4137-2a0d-6fc7-213-b38c-4085-28d1-ea2-2f26.ngrok-free.app", "http://localhost:5173"])
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
@@ -177,7 +177,7 @@ def upload_profile_pic():
     db.session.commit()
 
     return jsonify({'message': 'Profile picture uploaded successfully!', 'filename': filename}), 200
-    
+
 @app.route('/api/locations', methods=['GET'])
 def get_user_locations():
     users = User.query.filter(User.latitude != None, User.longitude != None).all()
