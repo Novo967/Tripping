@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer as LeafletMap, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import defaultProfilePic from '../Profile/ProfilrImage/undraw_businesswoman_8lrc.png'; // Put a default profile image
+
 import axios from 'axios';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -47,10 +47,15 @@ const MapContainer = () => {
           const response = await axios.get(`${SERVER_URL}/profile?email=${email}`);
           setUserProfilePic(response.data.profile_pic);
 
-          await axios.post(`${SERVER_URL}/update_location`, {
+          await axios.post(`${SERVER_URL}/api/update_location`, {
             email,
             latitude,
             longitude
+          }, {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            withCredentials: true  // רק אם השרת דורש cookies/session
           });
         } catch (error) {
           console.error('Error fetching profile picture:', error);
@@ -81,6 +86,7 @@ const MapContainer = () => {
         const res = await axios.get(`${SERVER_URL}/api/locations`);
         setAllUsers(res.data);
         
+
       } catch (err) {
         console.error('Error fetching all user locations:', err);
       }

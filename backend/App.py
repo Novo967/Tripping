@@ -177,6 +177,7 @@ def upload_profile_pic():
     db.session.commit()
 
     return jsonify({'message': 'Profile picture uploaded successfully!', 'filename': filename}), 200
+    
 @app.route('/api/locations', methods=['GET'])
 def get_user_locations():
     users = User.query.filter(User.latitude != None, User.longitude != None).all()
