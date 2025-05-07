@@ -1,46 +1,44 @@
+// Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const NavbarContainer = styled.nav`
-  background-color:rgb(162, 235, 217);
+  background: rgba(18, 17, 17, 0.6);
   height: 80px;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.2rem;
-  position: sticky;
+  position: fixed;
   top: 0;
   z-index: 999;
+  backdrop-filter: blur(8px);
 `;
 
 const Container = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   height: 80px;
-  max-width: 1500px;
   width: 100%;
+  max-width: 1400px;
+  padding: 0 24px;
 `;
 
 const Logo = styled(Link)`
   color: #fff;
-  justify-self: start;
-  margin-left: 20px;
-  cursor: pointer;
-  text-decoration: none;
   font-size: 2rem;
   display: flex;
   align-items: center;
-  position: relative;
-  transform: translate(0, 0);
+  text-decoration: none;
+  font-weight: bold;
 
-  @media screen and (max-width: 960px) {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(25%, 50%);
+  i {
+    margin-left: 8px;
+    color:rgb(254, 197, 123);
   }
 `;
 
@@ -49,10 +47,6 @@ const MenuIcon = styled.div`
 
   @media screen and (max-width: 960px) {
     display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(-100%, 60%);
     font-size: 1.8rem;
     cursor: pointer;
     color: #fff;
@@ -60,24 +54,18 @@ const MenuIcon = styled.div`
 `;
 
 const NavMenu = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(4, auto);
-  grid-gap: 10px;
+  display: flex;
+  align-items: center;
   list-style: none;
-  text-align: center;
-  width: 60vw;
-  justify-content: end;
-  margin-right: 2rem;
 
   @media screen and (max-width: 960px) {
     flex-direction: column;
-    display: ${({ active }) => (active ? 'flex' : 'none')};
     width: 100%;
     height: 90vh;
     position: absolute;
     top: 80px;
-    left: 0;
-    background: #242222;
+    left: ${({ active }) => (active ? '0' : '-100%')};
+    background: #121212;
     transition: all 0.5s ease;
     z-index: 1;
   }
@@ -91,57 +79,55 @@ const NavLink = styled(Link)`
   color: #fff;
   display: flex;
   align-items: center;
+  padding: 0 1rem;
   text-decoration: none;
-  padding: 0.5rem 1rem;
   height: 100%;
+  font-weight: 500;
 
   &:hover {
-    border-bottom: 4px solid #fff;
-    transition: all 0.2s ease-out;
+    color: #feb47b;
+    transition: 0.3s;
+  }
 
-    @media screen and (max-width: 960px) {
-      background-color: #fff;
-      color: #242424;
-      border-bottom: none;
-      width: 100%;
-      display: table;
-      text-align: center;
+  @media screen and (max-width: 960px) {
+    padding: 1.5rem;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+
+    &:hover {
+      background:rgb(181, 149, 149);
+      color: #fff;
     }
   }
 `;
 
 const MobileLink = styled(Link)`
   display: none;
-  color: #fff;
 
   @media screen and (max-width: 960px) {
     display: block;
-    text-align: center;
-    margin: 2rem auto;
-    border-radius: 4px;
-    width: 80%;
-    text-decoration: none;
-    font-size: 1.5rem;
-    background-color: transparent;
+    margin: 20px auto;
+    font-size: 1.4rem;
     color: #fff;
-    padding: 14px 20px;
     border: 1px solid #fff;
-    transition: all 0.3s ease-out;
+    padding: 12px 24px;
+    border-radius: 30px;
+    text-decoration: none;
 
     &:hover {
       background: #fff;
-      color:rgb(238, 224, 224);
-      transition: 250ms;
+      color: #121212;
+      transition: 0.3s ease-in-out;
     }
   }
 `;
 
 const WelcomeMessage = styled.span`
-  display: flex;
-  flex-direction: column;
   margin-left: 20px;
-  font-weight: 500;
-  color: white;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 400;
 
   @media screen and (max-width: 690px) {
     display: none;
@@ -170,47 +156,36 @@ function Navbar() {
   }, []);
 
   return (
-    <>
-      <NavbarContainer>
-        <Container>
-          <Logo to='/' onClick={closeMobileMenu}>
-            Triping
-            <i className='fa-solid fa-shop' />
-          </Logo>
+    <NavbarContainer>
+      <Container>
+        <Logo to='/' onClick={closeMobileMenu}>
+          Triping <i className='fa-solid fa-location-dot' />
+        </Logo>
 
-          {username && <WelcomeMessage>Welcome, {username}!</WelcomeMessage>}
+        {username && <WelcomeMessage>Welcome, {username}!</WelcomeMessage>}
 
-          <MenuIcon onClick={handleClick}>
-            <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
-          </MenuIcon>
+        <MenuIcon onClick={handleClick}>
+          <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
+        </MenuIcon>
 
-          <NavMenu active={click}>
-            <NavItem>
-              <NavLink to='/' onClick={closeMobileMenu}>
-                Home
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink to='/services' onClick={closeMobileMenu}>
-                Services
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink to='/profile' onClick={closeMobileMenu}>
-                Profile
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <MobileLink to='/sign-up' onClick={closeMobileMenu}>
-                Sign Up
-              </MobileLink>
-            </NavItem>
-          </NavMenu>
+        <NavMenu active={click}>
+          <NavItem>
+            <NavLink to='/' onClick={closeMobileMenu}>Home</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink to='/services' onClick={closeMobileMenu}>Map</NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink to='/profile' onClick={closeMobileMenu}>Profile</NavLink>
+          </NavItem>
+          <NavItem>
+            <MobileLink to='/sign-up' onClick={closeMobileMenu}>Sign Up</MobileLink>
+          </NavItem>
+        </NavMenu>
 
-          {button && <Button buttonStyle='btn--outline'>SIGN UP</Button>}
-        </Container>
-      </NavbarContainer>
-    </>
+        {button && <Button buttonStyle='btn--outline'>SIGN UP</Button>}
+      </Container>
+    </NavbarContainer>
   );
 }
 

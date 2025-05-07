@@ -3,6 +3,7 @@ import { MapContainer as LeafletMap, TileLayer, Marker, Popup } from 'react-leaf
 import L from 'leaflet';
 import defaultProfilePic from '../Profile/ProfilrImage/undraw_businesswoman_8lrc.png'; // Put a default profile image
 import axios from 'axios';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const createProfileIcon = (photoUrl) => {
   const radius = 20; // גודל העיגול
@@ -43,10 +44,10 @@ const MapContainer = () => {
       const email = localStorage.getItem('userEmail');
       if (email) {
         try {
-          const response = await axios.get(`https://reactwebsite-2.onrender.com/profile?email=${email}`);
+          const response = await axios.get(`${SERVER_URL}/profile?email=${email}`);
           setUserProfilePic(response.data.profile_pic);
 
-          await axios.post(`https://reactwebsite-2.onrender.com/update_location`, {
+          await axios.post(`${SERVER_URL}/update_location`, {
             email,
             latitude,
             longitude
@@ -77,7 +78,7 @@ const MapContainer = () => {
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-        const res = await axios.get(`https://reactwebsite-2.onrender.com/locations`);
+        const res = await axios.get(`${SERVER_URL}/api/locations`);
         setAllUsers(res.data);
         
       } catch (err) {
@@ -105,7 +106,7 @@ const MapContainer = () => {
         <Marker
             position={[userLocation.latitude, userLocation.longitude]}
             icon={createProfileIcon(
-                userProfilePic ? `https://reactwebsite-2.onrender.com/uploads/${userProfilePic}` : null
+                userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null
             )}
             >
             <Popup>
@@ -116,7 +117,7 @@ const MapContainer = () => {
           <Marker
             key={user.id}
             position={[user.lat, user.lng]}
-            icon={createProfileIcon(user.profile_image ? `https://reactwebsite-2.onrender.com/uploads/${user.profile_image}` : null)}
+            icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
           >
             <Popup>
               {user.username}

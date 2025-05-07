@@ -7,6 +7,7 @@ import Gallery from '../Profile/Gallery';
 import UploadForm from '../Profile/UploadForm';
 import UploadProfilePic from '../Profile/UploadProfilePic';
 import styled from 'styled-components';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function Profile() {
   const [profile, setProfile] = useState(null);
@@ -19,7 +20,7 @@ function Profile() {
         return;
       }
       try {
-        const response = await axios.get(`https://reactwebsite-2.onrender.com/profile?email=${email}`);
+        const response = await axios.get(`${SERVER_URL}/profile?email=${email}`);
         setProfile(response.data);
       } catch (error) {
         console.error("Error loading profile:", error);
@@ -36,7 +37,7 @@ function Profile() {
       {profile?.profile_pic && (
         <ProfilePicture>
           <img
-            src={`https://reactwebsite-2.onrender.com/uploads/${profile.profile_pic}`}
+            src={`${SERVER_URL}/uploads/${profile.profile_pic}`}
             alt="Profile"
           />
         </ProfilePicture>

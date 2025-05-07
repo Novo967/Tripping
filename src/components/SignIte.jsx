@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
- 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 // Main SignUp component
 const SignUp = () => {
   // Define form data state for name, email, and password

@@ -5,7 +5,11 @@ import { Link } from 'react-router-dom';
 // Styled Components
 const CardsContainer = styled.div`
   padding: 4rem;
-  background: #ffffff04;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(38, 47, 55, 0.4)),
+            url('/images/backgroundTravel.jpg') center/cover no-repeat;
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+  z-index: 1;
+  position: relative;
 `;
 
 const InnerContainer = styled.div`
@@ -46,11 +50,17 @@ const CardLink = styled(Link)`
   display: flex;
   flex-flow: column;
   width: 100%;
-  box-shadow: 0 6px 20px rgba(56, 125, 255, 0.17);
-  filter: drop-shadow(0 6px 20px rgba(56, 125, 255, 0.017));
-  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.03));
+  border-radius: 12px;
   overflow: hidden;
   text-decoration: none;
+  background-color: #fff;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
 `;
 
 const PicWrap = styled.div`
@@ -62,15 +72,15 @@ const PicWrap = styled.div`
   &::after {
     content: attr(data-category);
     position: absolute;
-    bottom: 0;
-    margin-left: 10px;
-    padding: 6px 8px;
-    max-width: calc(100% - 60px);
+    bottom: 8px;
+    left: 8px;
+    padding: 6px 10px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     color: #fff;
-    background-color: #1f98f4;
-    box-sizing: border-box;
+    background-color: #2c3e50; /* כהה כמו ב-footer */
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -93,9 +103,11 @@ const Info = styled.div`
 `;
 
 const Text = styled.h5`
-  color: #000;
+   color: #2c3e50;
   font-size: 18px;
+  font-weight: 500;
   line-height: 24px;
+  margin: 0;
 `;
 
 // Component for single card

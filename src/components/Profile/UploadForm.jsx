@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const UploadForm = ({ onUploadSuccess }) => {
   const [file, setFile] = useState(null);
@@ -27,7 +28,7 @@ const UploadForm = ({ onUploadSuccess }) => {
 
     try {
       setUploading(true);
-      const res = await axios.post('https://reactwebsite-2.onrender.com/upload', formData, {
+      const res = await axios.post(`${SERVER_URL}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setMessage('Upload successful!');

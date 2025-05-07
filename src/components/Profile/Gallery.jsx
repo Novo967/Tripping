@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const Gallery = ({ photos }) => {
   return (
     <GalleryContainer>
@@ -9,7 +9,7 @@ const Gallery = ({ photos }) => {
         {photos && photos.length > 0 ? (
           photos.map((photo, index) => (
             <PhotoItem key={index}>
-              <img src={`https://reactwebsite-2.onrender.com/uploads/${photo.filename}`} alt="Uploaded" />
+              <img src={`${SERVER_URL}/uploads/${photo.filename}`} alt="Uploaded" />
             </PhotoItem>
           ))
         ) : (

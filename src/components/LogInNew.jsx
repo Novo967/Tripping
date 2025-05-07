@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 
 const Container = styled.div`
   width: 300px;
@@ -95,7 +97,7 @@ const LogingIn = () => {
     }
 
     try {
-      const response = await fetch('https://reactwebsite-2.onrender.com/signin', {
+      const response = await fetch(`${SERVER_URL}/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
