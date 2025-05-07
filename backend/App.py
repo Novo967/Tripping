@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 # Initialize app and config
 app = Flask(__name__)
-CORS(app, origins=["https://triping-7uyh6c9qh-novs-projects-c22b7ac3.vercel.app","http://localhost:3000", "https://4137-2a0d-6fc7-213-b38c-4085-28d1-ea2-2f26.ngrok-free.app", "http://localhost:5173"])
+CORS(app, origins=["https://triping-7uyh6c9qh-novs-projects-c22b7ac3.vercel.app"], supports_credentials=True)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
