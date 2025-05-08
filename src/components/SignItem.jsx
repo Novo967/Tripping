@@ -197,14 +197,21 @@ z-index: -1;
 `;
 
 const Card = styled.div`
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 16px;
-  margin: 150px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 420px;
-   &:hover {
+  margin: 150px auto;
+  padding: 40px;
+  background-color: #ffffff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  transition: transform 0.2s ease;
+
+  &:hover {
     transform: translateY(-2px);
   }
 `;
@@ -217,9 +224,10 @@ const Title = styled.h2`
 `;
 
 const Form = styled.form`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 `;
 
 const Input = styled.input`
