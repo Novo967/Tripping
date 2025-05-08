@@ -1,9 +1,8 @@
-// Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // עדכון הייבוא
 import styled from 'styled-components';
-
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const NavbarContainer = styled.nav`
   background: rgba(18, 17, 17, 0.6);
   height: 80px;
@@ -35,7 +34,6 @@ const Logo = styled(Link)`
   align-items: center;
   text-decoration: none;
   font-weight: bold;
-
   i {
     margin-left: 8px;
     color:rgb(254, 197, 123);
@@ -136,14 +134,15 @@ const WelcomeMessage = styled.span`
 
 function Navbar() {
   const [click, setClick] = useState(false);
-  const [button, setButton] = useState(true);
   const [username, setUsername] = useState(null);
+  const [button, setButton] = useState(true); // הגדרת מצב button
+  const navigate = useNavigate(); // השתמש ב useNavigate
 
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
 
   const showButton = () => {
-    setButton(window.innerWidth > 960);
+    setButton(window.innerWidth > 960);  // עדכון מצב button על פי רוחב המסך
   };
 
   useEffect(() => {
@@ -151,9 +150,29 @@ function Navbar() {
     const storedName = localStorage.getItem('name');
     setUsername(storedName || null);
 
-    window.addEventListener('resize', showButton);
+    window.addEventListener('resize', showButton); // עדכון כפתור בעת שינוי רוחב המסך
     return () => window.removeEventListener('resize', showButton);
   }, []);
+
+  const handleSignOut = async () => {
+    localStorage.removeItem('name');
+    setUsername(null);  // עדכון המצב
+    const userId = localStorage.getItem('user_id');
+      try {
+        await fetch(`${SERVER_URL}/signout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId }), // ← תיקון כאן
+        });
+      
+        
+        } catch (error) {
+          console.error('Sign out failed:', error);
+      }
+      navigate('/');  // ניווט לעמוד הבית // או שימוש ב-useNavigate אם אתה ב-React Router v6
+    };
 
   return (
     <NavbarContainer>
@@ -178,12 +197,19 @@ function Navbar() {
           <NavItem>
             <NavLink to='/profile' onClick={closeMobileMenu}>Profile</NavLink>
           </NavItem>
-          <NavItem>
-            <MobileLink to='/sign-up' onClick={closeMobileMenu}>Sign Up</MobileLink>
-          </NavItem>
+
+          {username ? (
+            <NavItem>
+              <NavLink to='#' onClick={handleSignOut}>Sign Out</NavLink>
+            </NavItem>
+          ) : (
+            <NavItem>
+              <MobileLink to='/sign-up' onClick={closeMobileMenu}>Sign Up</MobileLink>
+            </NavItem>
+          )}
         </NavMenu>
 
-        {button && <Button buttonStyle='btn--outline'>SIGN UP</Button>}
+        {button && !username && <Button buttonStyle='btn--outline'>SIGN UP</Button>}
       </Container>
     </NavbarContainer>
   );

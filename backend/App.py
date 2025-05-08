@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 # Initialize app and config
 app = Flask(__name__)
-CORS(app, origins=["https://triping-7uyh6c9qh-novs-projects-c22b7ac3.vercel.app"], supports_credentials=True)
+CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
@@ -35,6 +35,7 @@ class User(db.Model):
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     profile_pic = db.Column(db.String(255))  # <-- ADD THIS
+    is_online = db.Column(db.Boolean, default=False)
 
 # Create tables
 with app.app_context():
@@ -62,6 +63,9 @@ def signin():
     data = request.json
     email = data.get('email')
     password = data.get('password')
+    is_online = True
+    User.is_online = True
+    db.session.commit()
 
     if not email or not password:
         return jsonify({'error': 'Missing email or password'}), 400
@@ -83,7 +87,8 @@ def signup():
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
-
+    User.is_online = True
+    db.session.commit()
     if not name or not email or not password:
         return jsonify({'error': 'Missing fields'}), 400
 
@@ -100,15 +105,30 @@ def signup():
 
     return jsonify({'message': 'User created successfully', 'name': new_user.name, 'email': new_user.email}), 201
 
+@app.route('/signout', methods=['POST'])
+def signout():
+    email = request.json.get('email')
+    User.is_online=False
+    db.session.commit()
+    user = User.query.filter_by(email=email).first()
+    if user:
+        is_online=False
+        user.is_online = False
+        db.session.commit()
+    return jsonify({'message': 'Signed out successfully'}), 200
+
 @app.route('/profile', methods=['GET'])
 def get_profile():
     email = request.args.get('email')
     if not email:
         return jsonify({'error': 'Email required'}), 400
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email, is_online=True).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
+
+   
+
     photos = Photo.query.filter_by(user_id=user.id).all()
     return jsonify({
         'name': user.name,
@@ -185,7 +205,7 @@ def upload_profile_pic():
 
 @app.route('/api/locations', methods=['GET'])
 def get_user_locations():
-    users = User.query.filter(User.latitude != None, User.longitude != None).all()
+    users = User.query.filter(User.latitude != None, User.longitude != None,  User.is_online == True).all()
     return jsonify([
         {
             'id': user.id,
@@ -206,7 +226,7 @@ def update_location():
     if not all([email, latitude, longitude]):
         return jsonify({'error': 'Missing data'}), 400
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email, is_online=True).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
