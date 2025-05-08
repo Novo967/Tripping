@@ -63,11 +63,15 @@ export const Button = ({ children, type, onclick, buttonStyle, buttonSize }) => 
   const validStyle = STYLES.includes(buttonStyle) ? buttonStyle : STYLES[0];
   const validSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
 
+  const handleClick = (e) => {
+    if (onclick) onclick(e);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // גלילה לראש הדף
+  };
+
   return (
-    <ButtonWrapper to="/sign-up">
+    <ButtonWrapper to="/login" onClick={handleClick}>
       <StyledButton
         type={type}
-        onClick={onclick}
         buttonStyle={validStyle}
         size={validSize}
       >

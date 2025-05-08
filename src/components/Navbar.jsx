@@ -62,7 +62,7 @@ const NavMenu = styled.ul`
     height: 90vh;
     position: absolute;
     top: 80px;
-    left: ${({ active }) => (active ? '0' : '-100%')};
+    right: ${({ active }) => (active ? '0' : '-100%')};
     background: #121212;
     transition: all 0.5s ease;
     z-index: 1;

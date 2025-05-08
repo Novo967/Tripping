@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const Container = styled.div`
   width: 100%;
   max-width: 420px;
-  margin: 150px auto;
+  margin: 80px auto;
   padding: 40px;
   background-color: #ffffff;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -26,7 +26,7 @@ const Container = styled.div`
 `;
 
 const Title = styled.h2`
-  color: #4C46B1;
+  color: #1a1a1a;
   font-size: 32px;
   font-weight: 700;
   margin-bottom: 32px;
@@ -65,7 +65,7 @@ const Input = styled.input`
 const Button = styled.button`
   width: 100%;
   padding: 14px;
-  background-color:rgb(26, 44, 61);
+  background-color: #007AFF;
   color: white;
   border: none;
   border-radius: 12px;
@@ -117,54 +117,6 @@ const Success = styled.p`
   font-size: 16px;
   margin-top: 20px;
   font-weight: 500;
-`;
-
-const HeroContainer = styled.section`
-  position: relative;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-
-  video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: scale(1);
-    object-fit: cover;
-    filter: none;
-    z-index: -2;
-  }
-`;
-const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: -1;
-`;
-
-const BottomGradient = styled.div`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(to top, black 0%, transparent 50%);
-  z-index: -1;
-`;
-const LinkToSignIn = styled(Link)`
-  text-align: center;
-  margin-top: 12px;
-  color: #6C63FF;
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
 `;
 
 const LogingIn = () => {
@@ -229,10 +181,6 @@ const LogingIn = () => {
   };
 
   return (
-    <HeroContainer>
-      <video src="/videos/video-5.mp4" autoPlay loop muted />
-      <Overlay />
-      <BottomGradient />
     <Container>
       <Title>Log In</Title>
       {submitted ? (
@@ -265,12 +213,10 @@ const LogingIn = () => {
           </PasswordWrapper>
           {errors.form && <Error>{errors.form}</Error>}
           <Button type="submit">Log in</Button>
-          <LinkToSignIn to="/sign-up">Doesn't have an account? Sign up</LinkToSignIn>
         </Form>
       )}
     </Container>
-    </HeroContainer>
   );
 };
 
-export default LogingIn;
+export default LogingIn; 

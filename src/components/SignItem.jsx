@@ -76,7 +76,10 @@ const SignUp = () => {
   };
 
   return (
-    <SignUpContainer>
+    <HeroContainer>
+      <video src="/videos/video-5.mp4" autoPlay loop muted />
+      <Overlay />
+      <BottomGradient />
       <Card>
         <Title>Create an Account</Title>
         {submitted ? (
@@ -149,28 +152,61 @@ const SignUp = () => {
           </Form>
         )}
       </Card>
-    </SignUpContainer>
+      </HeroContainer>
   );
 };
 
 export default SignUp;
 
 // Styled-components
-const SignUpContainer = styled.div`
-  min-height: 100vh;
-  background: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const HeroContainer = styled.section`
+position: relative;
+height: 100vh;
+width: 100%;
+overflow: hidden;
+
+video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(1);
+  object-fit: cover;
+  filter: none;
+  z-index: -2;
+}
+`;
+const Overlay = styled.div`
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.4);
+z-index: -1;
+`;
+
+const BottomGradient = styled.div`
+position: absolute;
+bottom: 0;
+width: 100%;
+height: 100px;
+background: linear-gradient(to top, black 0%, transparent 50%);
+z-index: -1;
 `;
 
 const Card = styled.div`
   background: #ffffff;
   padding: 40px;
   border-radius: 16px;
+  margin: 150px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 420px;
+   &:hover {
+    transform: translateY(-2px);
+  }
 `;
 
 const Title = styled.h2`
@@ -188,12 +224,24 @@ const Form = styled.form`
 
 const Input = styled.input`
   width: 100%;
-  padding: 12px 16px;
-  padding-right: 40px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid #eaeaea;
+  background-color: #ffffff;
+  font-size: 15px;
+  color: #1a1a1a;
   box-sizing: border-box;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #007AFF;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: #999;
+  }
 `;
 
 const PasswordWrapper = styled.div`
@@ -211,19 +259,25 @@ const toggleIcon = {
 };
 
 const SubmitButton = styled.button`
-  padding: 12px;
-  background-color: #6C63FF;
+  width: 100%;
+  padding: 14px;
+  background-color:rgb(26, 44, 61);
   color: white;
   border: none;
+  border-radius: 12px;
   cursor: pointer;
-  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.2s ease;
+  margin-top: 8px;
 
   &:hover {
-    background-color: #574fd6;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #0066CC;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 `;
 
