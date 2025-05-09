@@ -3,7 +3,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import Navbar from './components/Navbar';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/pages/Home';
-import Services from './components/pages/Services';
+import MapPage from './components/pages/MapPage';
 import Profile from './components/pages/Profile';
 import SignUp from './components/pages/SignUp';
 import Footer from './components/Footer';
@@ -41,7 +41,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/services' element={<Services />} />
+        <Route path='/MapPage' element={<MapPage />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/login' element={<LogingIn />} />

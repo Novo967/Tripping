@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
 // Styled Components
-const CardsContainer = styled.section`
+const Container = styled.section`
   position: relative;
   padding: 6rem 2rem 4rem;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(38, 47, 55, 0.7)),
@@ -57,20 +57,18 @@ const SubText = styled.p`
   margin-bottom: 2.5rem;
 `;
 
-
-// Main Cards component
-function Cards() {
+function SecondSection() {
   return (
-    <CardsContainer>
+    <Container>
       <InnerContainer>
         <HeroText>Make friends easy, any time, any place</HeroText>
         <SubText>With Triping you can explore new people around the World</SubText>
-        <Button className='btns' buttonStyle='btn--outline' buttonSize='btn--large'>
+        <Button className='btns' to='/login' buttonStyle='btn--outline' buttonSize='btn--large'>
           Get Started <i className="fas fa-map-marker-alt" />
         </Button>
       </InnerContainer>
-    </CardsContainer>
+    </Container>
   );
 }
 
-export default Cards;
+export default SecondSection;

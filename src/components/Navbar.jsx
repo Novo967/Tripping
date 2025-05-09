@@ -177,7 +177,7 @@ function Navbar() {
   return (
     <NavbarContainer>
       <Container>
-        <Logo to='/' onClick={closeMobileMenu}>
+        <Logo to='/' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
           Triping <i className='fa-solid fa-location-dot' />
         </Logo>
 
@@ -192,7 +192,7 @@ function Navbar() {
             <NavLink to='/' onClick={closeMobileMenu}>Home</NavLink>
           </NavItem>
           <NavItem>
-            <NavLink to='/services' onClick={closeMobileMenu}>Map</NavLink>
+            <NavLink to='/MapPage' onClick={closeMobileMenu}>Map</NavLink>
           </NavItem>
           <NavItem>
             <NavLink to='/profile' onClick={closeMobileMenu}>Profile</NavLink>

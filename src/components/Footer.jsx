@@ -168,9 +168,9 @@ function Footer() {
       </SubscriptionBox>
 
       <SocialBar>
-        <Logo to="/">
-          Triping <i className="fa-solid fa-location-dot" />
-        </Logo>
+      <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        Triping <i className="fa-solid fa-location-dot" />
+      </Logo>
         <Rights>© 2025 Triping. All rights reserved.</Rights>
         <SocialIcons>
           <Link to="#"><i className="fab fa-facebook-f" /></Link>

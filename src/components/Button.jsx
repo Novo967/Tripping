@@ -53,13 +53,18 @@ const StyledButton = styled.button`
         transform: translateY(-2px);
       }
     `}
+
+    i {
+    margin-left: 8px;
+    display: inline-block;
+  }
 `;
 
 const ButtonWrapper = styled(Link)`
   text-decoration: none;
 `;
 
-export const Button = ({ children, type, onclick, buttonStyle, buttonSize }) => {
+export const Button = ({ children, type, onclick, buttonStyle, buttonSize, to }) => {
   const validStyle = STYLES.includes(buttonStyle) ? buttonStyle : STYLES[0];
   const validSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
 
@@ -69,7 +74,7 @@ export const Button = ({ children, type, onclick, buttonStyle, buttonSize }) => 
   };
 
   return (
-    <ButtonWrapper to="/login" onClick={handleClick}>
+    <ButtonWrapper to={to} onClick={handleClick}>
       <StyledButton
         type={type}
         buttonStyle={validStyle}

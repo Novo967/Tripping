@@ -1,13 +1,13 @@
 import React from 'react';
 import '../../App.jsx'
 import HeroSection from '../HeroSection'
-import Cards from '../Cards';
+import SecondSection from '../SecondSection.jsx';
 
 function Home () {
     return (
         <>
             <HeroSection/>
-            <Cards/>
+            <SecondSection/>
         </>
     )
 }

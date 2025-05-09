@@ -13,10 +13,10 @@ function HeroSection() {
         <h1>Explore travelers around you</h1>
         <p>Join the community</p>
         <HeroButtons>
-          <Button className='btns' buttonStyle='btn--outline' buttonSize='btn--large'>
+          <Button className='btns' to='/login' buttonStyle='btn--outline' buttonSize='btn--large'>
             Get Started <i className="fas fa-map-marker-alt" />
           </Button>
-          <Button className='btns' buttonStyle='btn--primary' buttonSize='btn--large'>
+          <Button className='btns' to='/' buttonStyle='btn--primary' buttonSize='btn--large'>
             Watch Trailer <i className='far fa-play-circle' />
           </Button>
         </HeroButtons>
