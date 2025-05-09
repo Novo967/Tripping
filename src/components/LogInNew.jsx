@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const Container = styled.div`
@@ -173,6 +175,7 @@ const LogingIn = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { setUsername } = useContext(UserContext);
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -221,7 +224,10 @@ const LogingIn = () => {
       localStorage.setItem('name', data.name);
       localStorage.setItem('userEmail', data.email);
       setFormData({ email: '', password: '' });
-      navigate('/');
+      setTimeout(() => {
+        navigate('/');
+      }, 0);
+      setUsername(data.name);
     } catch (err) {
       console.error('Fetch error:', err);
       setErrors({ form: 'Failed to connect to server.' });

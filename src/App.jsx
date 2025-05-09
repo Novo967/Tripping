@@ -9,7 +9,7 @@ import SignUp from './components/pages/SignUp';
 import Footer from './components/Footer';
 import LogingIn from './components/pages/LogingIn';
 import 'leaflet/dist/leaflet.css';
-
+import { UserProvider } from './components/UserContext';
 // גלובלי לכל האפליקציה
 const GlobalStyle = createGlobalStyle`
   * {
@@ -37,18 +37,20 @@ const PageWrapper = styled.div`
 
 function App() {
   return (
-    <Router>
-      <GlobalStyle />
-      <Navbar />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/MapPage' element={<MapPage />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/sign-up' element={<SignUp />} />
-        <Route path='/login' element={<LogingIn />} />
-      </Routes>
-      <Footer />
-    </Router>
+    <UserProvider>
+      <Router>
+        <GlobalStyle />
+        <Navbar />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/MapPage' element={<MapPage />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/sign-up' element={<SignUp />} />
+          <Route path='/login' element={<LogingIn />} />
+        </Routes>
+        <Footer />
+      </Router>
+    </UserProvider>
   );
 }
 

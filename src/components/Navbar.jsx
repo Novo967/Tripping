@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './Button';
+import {Button} from './Button';
 import { Link, useNavigate } from 'react-router-dom'; // עדכון הייבוא
 import styled from 'styled-components';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const NavbarContainer = styled.nav`
   background: rgba(18, 17, 17, 0.6);
@@ -134,10 +136,9 @@ const WelcomeMessage = styled.span`
 
 function Navbar() {
   const [click, setClick] = useState(false);
-  const [username, setUsername] = useState(null);
   const [button, setButton] = useState(true); // הגדרת מצב button
   const navigate = useNavigate(); // השתמש ב useNavigate
-
+  const { username, logout } = useContext(UserContext);
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
 
@@ -146,34 +147,27 @@ function Navbar() {
   };
 
   useEffect(() => {
-    showButton();
-    const storedName = localStorage.getItem('name');
-    setUsername(storedName || null);
-
-    window.addEventListener('resize', showButton); // עדכון כפתור בעת שינוי רוחב המסך
+   showButton();
+    window.addEventListener('resize', showButton);
     return () => window.removeEventListener('resize', showButton);
   }, []);
 
   const handleSignOut = async () => {
-    localStorage.removeItem('name');
-    setUsername(null);  // עדכון המצב
-    const userId = localStorage.getItem('user_id');
-      try {
-        await fetch(`${SERVER_URL}/signout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId }), // ← תיקון כאן
-        });
-      
-        
-        } catch (error) {
-          console.error('Sign out failed:', error);
-      }
-      navigate('/');  // ניווט לעמוד הבית // או שימוש ב-useNavigate אם אתה ב-React Router v6
-    };
-
+    try {
+      const userId = localStorage.getItem('user_id');
+      await fetch(`${SERVER_URL}/signout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+      logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    }
+  };
   return (
     <NavbarContainer>
       <Container>
@@ -197,7 +191,6 @@ function Navbar() {
           <NavItem>
             <NavLink to='/profile' onClick={closeMobileMenu}>Profile</NavLink>
           </NavItem>
-
           {username ? (
             <NavItem>
               <NavLink to='#' onClick={handleSignOut}>Sign Out</NavLink>
@@ -209,7 +202,10 @@ function Navbar() {
           )}
         </NavMenu>
 
-        {button && !username && <Button buttonStyle='btn--outline'>SIGN UP</Button>}
+        {button && !username && (
+          <Button to='/login' buttonStyle='btn--outline'>SIGN UP</Button>
+        )}
+        
       </Container>
     </NavbarContainer>
   );
