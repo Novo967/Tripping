@@ -12,17 +12,16 @@ const Container = styled.section`
   color: white;
   overflow: hidden;
   height: 600px;
+  border-top: 30px solid transparent;
 
-  &::after {
+  &::before {
     content: "";
     position: absolute;
-    bottom: -1px;
+    top: -30px;
     left: 0;
     width: 100%;
-    height: 80px;
-    background: white;
-    clip-path: polygon(0 0, 100% 100%, 0 100%);
-    z-index: 2;
+    height: 60px;
+    z-index: 1;
   }
 `;
 

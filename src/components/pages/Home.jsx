@@ -5,7 +5,7 @@ import SecondSection from '../SecondSection.jsx';
 
 function Home () {
     return (
-        <>
+        <> 
             <HeroSection/>
             <SecondSection/>
         </>
