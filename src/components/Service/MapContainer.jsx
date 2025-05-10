@@ -79,7 +79,11 @@ const BottomLink = styled.div`
     }
   }
 `;
-
+const ServiceContainer = styled.div`
+  margin-top: 75px;
+  padding: 10px;
+  text-align: center;
+`;
 const createProfileIcon = (photoUrl) => {
   const radius = 20; // גודל העיגול
 
@@ -197,37 +201,39 @@ if (!isLoggedIn) {
   }
   return (
     <div className="map-placeholder">
-      <LeafletMap 
-        center={[userLocation.latitude, userLocation.longitude]} 
-        zoom={13} 
-        style={{ height: "60vh", width: "100%" }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        />
-        <Marker
-            position={[userLocation.latitude, userLocation.longitude]}
-            icon={createProfileIcon(
-                userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null
-            )}
-            >
-            <Popup>
-                You are here!
-            </Popup>
-        </Marker>
-        {allUsers.map((user) => (
+      <ServiceContainer>
+        <LeafletMap 
+          center={[userLocation.latitude, userLocation.longitude]} 
+          zoom={13} 
+          style={{ height: "60vh", width: "100%" }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
           <Marker
-            key={user.id}
-            position={[user.lat, user.lng]}
-            icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
-          >
-            <Popup>
-              {user.username}
-            </Popup>
+              position={[userLocation.latitude, userLocation.longitude]}
+              icon={createProfileIcon(
+                  userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null
+              )}
+              >
+              <Popup>
+                  You are here!
+              </Popup>
           </Marker>
-        ))}
+          {allUsers.map((user) => (
+            <Marker
+              key={user.id}
+              position={[user.lat, user.lng]}
+              icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
+            >
+              <Popup>
+                {user.username}
+              </Popup>
+            </Marker>
+          ))}
       </LeafletMap>
+      </ServiceContainer>
     </div>
   );
 };
