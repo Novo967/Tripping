@@ -1,12 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer as LeafletMap, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { useNavigate } from 'react-router-dom';
+import { Button } from '../Button';
 import axios from 'axios';
 import styled from 'styled-components';
-import { Button } from '../Button';
+import { useNavigate } from 'react-router-dom';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-  const Overlay = styled.div`
+const Message = styled.div`
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  overflow: hidden;
+
+  video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    z-index: 2;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    color: #eee;
+    z-index: 2;
+  }
+`;
+
+const Overlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
@@ -15,6 +52,16 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
   background: rgba(0, 0, 0, 0.45);
   z-index: -1;
 `;
+
+const BottomGradient = styled.div`
+  position: absolute;
+  bottom: 0;
+  height: 40%;
+  width: 100%;
+  background: linear-gradient(to top, rgba(217, 192, 188, 0.6), transparent);
+  z-index: -1;
+`;
+
 const BottomLink = styled.div`
   margin-top: 1rem;
   font-size: 0.95rem;
@@ -33,50 +80,6 @@ const BottomLink = styled.div`
   }
 `;
 
-const BottomGradient = styled.div`
-  position: absolute;
-  bottom: 0;
-  height: 40%;
-  width: 100%;
-  background: linear-gradient(to top, rgba(217, 192, 188, 0.6), transparent);
-  z-index: -1;
-`;
-  const Message = styled.div`
-    position: relative;
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 2rem;
-    overflow: hidden;
-
-    video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -2;
-    }
-
-    h2 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      color: #fff;
-      z-index: 2;
-    }
-
-    p {
-      margin-bottom: 1.5rem;
-      font-size: 1.2rem;
-      color: #eee;
-      z-index: 2;
-    }
-  `;
 const createProfileIcon = (photoUrl) => {
   const radius = 20; // גודל העיגול
 
@@ -112,7 +115,7 @@ const MapContainer = () => {
   const [userProfilePic, setUserProfilePic] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const navigate = useNavigate();
+    const navigate = useNavigate();
   useEffect(() => {
     const fetchUserProfile = async (latitude, longitude) => {
       const email = localStorage.getItem('userEmail');
@@ -158,10 +161,6 @@ const MapContainer = () => {
       console.error('Geolocation not supported.');
     }
   }, []);
-
-  
-    
-
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
@@ -176,14 +175,13 @@ const MapContainer = () => {
   
     fetchAllUsers();
   }, []);
-  
   if (!userLocation) {
     return <div className="map-placeholder">Loading your location...</div>;
   }
-  if (!isLoggedIn) {
+if (!isLoggedIn) {
     return (
       <Message>
-        <video src="/videos/video-5.mp4" autoPlay loop muted />          
+        <video src="/videos/video-5.mp4" autoPlay loop muted />
         <Overlay />
         <BottomGradient />
         <h2>It seems we don't know each other yet</h2>

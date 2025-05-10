@@ -175,7 +175,7 @@ const LogingIn = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { username, setUsername } = useContext(UserContext);
+  const { setUsername } = useContext(UserContext);
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -219,18 +219,15 @@ const LogingIn = () => {
         }
         return;
       }
-      
+
       setSubmitted(true);
       localStorage.setItem('name', data.name);
       localStorage.setItem('userEmail', data.email);
       setFormData({ email: '', password: '' });
-      navigate('/');
+      setTimeout(() => {
+        navigate('/');
+      }, 0);
       setUsername(data.name);
-      
-
-      
-      
-      
     } catch (err) {
       console.error('Fetch error:', err);
       setErrors({ form: 'Failed to connect to server.' });
@@ -245,7 +242,7 @@ const LogingIn = () => {
     <Container>
       <Title>Log In</Title>
       {submitted ? (
-        <Success>Thanks for logging in {username}!</Success>
+        <Success>Thanks for logging in {formData.name}!</Success>
       ) : (
         <Form onSubmit={handleSubmit}>
           <div>

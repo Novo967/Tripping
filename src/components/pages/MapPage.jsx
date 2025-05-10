@@ -14,7 +14,7 @@ export default Service;
 
 // styled-components
 const ServiceContainer = styled.div`
-  margin-top: 100px;
-  padding: 10px;
   text-align: center;
 `;
+
+
