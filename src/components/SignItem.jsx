@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -19,6 +21,7 @@ const SignUp = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -37,10 +40,11 @@ const SignUp = () => {
     if (formData.password !== formData.confirmpassword) newErrors.confirmpassword = "Passwords do not match.";
     return newErrors;
   };
-
+  const { login } = useContext(UserContext); 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
+    // מוסיף בתחילת הקומפוננטה
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -67,6 +71,7 @@ const SignUp = () => {
       setSubmitted(true);
       localStorage.setItem('name', data.name);
       localStorage.setItem('userEmail', data.email);
+      login(data.name);
       navigate('/');
       setFormData({ name: '', lastname: '', email: '', password: '', confirmpassword: '' });
     } catch (err) {

@@ -175,8 +175,7 @@ const LogingIn = () => {
   const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { setUsername } = useContext(UserContext);
-
+  const { login } = useContext(UserContext); 
   const handleChange = (e) => {
     setFormData(prev => ({
       ...prev,
@@ -224,10 +223,8 @@ const LogingIn = () => {
       localStorage.setItem('name', data.name);
       localStorage.setItem('userEmail', data.email);
       setFormData({ email: '', password: '' });
-      setTimeout(() => {
-        navigate('/');
-      }, 0);
-      setUsername(data.name);
+      login(data.name);
+      navigate('/');
     } catch (err) {
       console.error('Fetch error:', err);
       setErrors({ form: 'Failed to connect to server.' });
