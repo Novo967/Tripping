@@ -95,10 +95,10 @@ def signup():
 
     hashed_password = generate_password_hash(password)
     
+    new_user = User(name=name, email=email, password=hashed_password, is_online=True)
     
     db.session.add(new_user)
     db.session.commit()
-    new_user = User(name=name, email=email, password=hashed_password, is_online=True)
 
     return jsonify({'message': 'User created successfully', 'name': new_user.name, 'email': new_user.email}), 201
 
