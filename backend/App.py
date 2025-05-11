@@ -67,7 +67,7 @@ def signin():
         return jsonify({'error': 'Missing email or password'}), 400
 
     
-
+    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -75,7 +75,7 @@ def signin():
         return jsonify({'error': 'Invalid password'}), 401
     user.is_online = True
     db.session.commit()
-    user = User.query.filter_by(email=email).first()
+    
     return jsonify({'message': 'Login successful', 'name': user.name, 'email': user.email}), 200
 
 # Sign-up route
@@ -118,7 +118,7 @@ def get_profile():
     if not email:
         return jsonify({'error': 'Email required'}), 400
 
-    user = User.query.filter_by(email=email, is_online=True).first()
+    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
