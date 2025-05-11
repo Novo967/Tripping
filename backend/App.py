@@ -64,8 +64,7 @@ def signin():
     email = data.get('email')
     password = data.get('password')
     is_online = True
-    user.is_online = True
-    db.session.commit()
+   
 
     if not email or not password:
         return jsonify({'error': 'Missing email or password'}), 400
@@ -77,7 +76,8 @@ def signin():
 
     if not check_password_hash(user.password, password):
         return jsonify({'error': 'Invalid password'}), 401
-
+    user.is_online = True
+    db.session.commit()
     return jsonify({'message': 'Login successful', 'name': user.name, 'email': user.email}), 200
 
 # Sign-up route
@@ -87,8 +87,7 @@ def signup():
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
-    user.is_online = True
-    db.session.commit()
+   
     if not name or not email or not password:
         return jsonify({'error': 'Missing fields'}), 400
 
