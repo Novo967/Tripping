@@ -221,7 +221,7 @@ if (!isLoggedIn) {
                   You are here!
               </Popup>
           </Marker>
-          {allUsers.filter(user => user.isLoggedIn).map((user) => (
+          {allUsers.filter(user => user.is_online).map((user) => (
             <Marker
               key={user.id}
               position={[user.lat, user.lng]}
