@@ -63,13 +63,10 @@ def signin():
     data = request.json
     email = data.get('email')
     password = data.get('password')
-    is_online = True
-   
-
     if not email or not password:
         return jsonify({'error': 'Missing email or password'}), 400
 
-    user = User.query.filter_by(email=email).first()
+    
 
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -78,6 +75,7 @@ def signin():
         return jsonify({'error': 'Invalid password'}), 401
     user.is_online = True
     db.session.commit()
+    user = User.query.filter_by(email=email).first()
     return jsonify({'message': 'Login successful', 'name': user.name, 'email': user.email}), 200
 
 # Sign-up route
@@ -96,19 +94,17 @@ def signup():
         return jsonify({'error': 'Email already registered'}), 409
 
     hashed_password = generate_password_hash(password)
-    new_user = User(name=name, email=email, password=hashed_password, is_online=True)
+    
     
     db.session.add(new_user)
     db.session.commit()
-    
+    new_user = User(name=name, email=email, password=hashed_password, is_online=True)
 
     return jsonify({'message': 'User created successfully', 'name': new_user.name, 'email': new_user.email}), 201
 
 @app.route('/signout', methods=['POST'])
 def signout():
     email = request.json.get('email')
-    User.is_online=False
-    db.session.commit()
     user = User.query.filter_by(email=email).first()
     if user:
         is_online=False
