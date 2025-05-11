@@ -64,7 +64,7 @@ def signin():
     email = data.get('email')
     password = data.get('password')
     is_online = True
-    User.is_online = True
+    user.is_online = True
     db.session.commit()
 
     if not email or not password:
@@ -87,7 +87,7 @@ def signup():
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
-    User.is_online = True
+    user.is_online = True
     db.session.commit()
     if not name or not email or not password:
         return jsonify({'error': 'Missing fields'}), 400
@@ -97,7 +97,7 @@ def signup():
         return jsonify({'error': 'Email already registered'}), 409
 
     hashed_password = generate_password_hash(password)
-    new_user = User(name=name, email=email, password=hashed_password)
+    new_user = User(name=name, email=email, password=hashed_password, is_online=True)
     
     db.session.add(new_user)
     db.session.commit()
