@@ -4,22 +4,25 @@ import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
 const FooterContainer = styled.footer`
-  background-color:rgba(18, 17, 17, 0.6);
+  background: rgba(18, 17, 17, 0.6);
+  backdrop-filter: blur(8px);
+  color: #f0f0f0;
   padding: 4rem 1rem 2rem;
-  color:rgb(250, 243, 243);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const FooterTop = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 4rem;
-  margin-bottom: 3rem;
+  justify-content: space-between;
+   max-width: 1200px;
+  margin: 0 auto 3rem;
+  gap: 3rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    text-align: center;
   }
 `;
 
@@ -30,17 +33,19 @@ const FooterSection = styled.div`
   h3 {
     font-size: 1.2rem;
     margin-bottom: 1rem;
-    color: #8493a6;
+     color: #feb47b;
+    letter-spacing: 0.5px;
   }
 
   a {
-    color:rgb(221, 31, 56);
+    color: #dcdcdc;
     text-decoration: none;
     margin-bottom: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    transition: 0.3s ease;
 
     &:hover {
-      color:rgb(211, 230, 228);
+      color: #fff;
       transition: 0.3s ease;
     }
   }
@@ -48,25 +53,25 @@ const FooterSection = styled.div`
 
 const SubscriptionBox = styled.div`
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 
   h2 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     margin-bottom: 0.5rem;
-    color: #8493a6;
+    color: #feb47b;
   }
 
   p {
     font-size: 1.1rem;
     margin-bottom: 1rem;
+    color: #ccc;
   }
 
   input {
     padding: 0.6rem 1rem;
-    border-radius: 8px;
+    border-radius: 25px;
     border: none;
     font-size: 1rem;
-    margin-right: 0.5rem;
     width: 250px;
     max-width: 90%;
   }
@@ -79,8 +84,9 @@ const SubscriptionBox = styled.div`
 
     form {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
   }
 `;
@@ -129,49 +135,53 @@ const SocialIcons = styled.div`
   }
 `;
 
+const FooterBottom = styled.div`
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+  color: #aaa;
+`;
+
 function Footer() {
   return (
     <FooterContainer>
       <FooterTop>
         <FooterSection>
           <h3>About Us</h3>
-          <Link to="#">How it works</Link>
-          <Link to="#">Our vision</Link>
-          <Link to="#">Who we are</Link>
-          <Link to="#">Support us</Link>
+          <Link to='/'>Our Story</Link>
+          <Link to='/'>Careers</Link>
+          <Link to='/'>Contact</Link>
         </FooterSection>
 
         <FooterSection>
-          <h3>Community</h3>
-          <Link to="#">Join us</Link>
-          <Link to="#">Contribute</Link>
-          <Link to="#">Events</Link>
-          <Link to="#">Help center</Link>
+          <h3>Explore</h3>
+          <Link to='/'>Map</Link>
+          <Link to='/'>Profiles</Link>
+          <Link to='/'>Communities</Link>
         </FooterSection>
 
         <FooterSection>
-          <h3>Social</h3>
-          <Link to="#">Facebook</Link>
-          <Link to="#">Instagram</Link>
-          <Link to="#">Twitter</Link>
-          <Link to="#">TikTok</Link>
+          <h3>Follow</h3>
+          <a href='https://instagram.com'>Instagram</a>
+          <a href='https://facebook.com'>Facebook</a>
+          <a href='https://twitter.com'>Twitter</a>
         </FooterSection>
       </FooterTop>
-
+      <FooterBottom/>
       <SubscriptionBox>
-        <h2>Join our community</h2>
-        <p>It's free, inspiring, and just one click away.</p>
+        <h2>Stay Connected</h2>
+        <p>Get updates and news directly to your inbox</p>
         <form>
-          <input type="email" placeholder="Your email" />
-          <Button buttonStyle="btn--outline">Sign Up</Button>
+          <input type="email" placeholder="Enter your email" />
+          <Button buttonStyle='btn--outline'>Subscribe</Button>
         </form>
       </SubscriptionBox>
-
       <SocialBar>
-      <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        Triping <i className="fa-solid fa-location-dot" />
-      </Logo>
-        <Rights>© 2025 Triping. All rights reserved.</Rights>
+        <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          Triping <i className="fa-solid fa-location-dot" />
+        </Logo>
+          © {new Date().getFullYear()} Triping. All rights reserved.
         <SocialIcons>
           <Link to="#"><i className="fab fa-facebook-f" /></Link>
           <Link to="#"><i className="fab fa-instagram" /></Link>
@@ -184,3 +194,4 @@ function Footer() {
 }
 
 export default Footer;
+
