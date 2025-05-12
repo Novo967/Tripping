@@ -3,7 +3,6 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import ProfileHeader from './ProfileServices/ProfileHeader';
-import UploadPhoto from './ProfileServices/UploadPhoto';
 import Gallery from './ProfileServices/Gallery';
 import { Button } from '../../Service/Button';
 import UploadForm from './ProfileServices/UploadForm';

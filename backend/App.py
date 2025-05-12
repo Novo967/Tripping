@@ -106,9 +106,10 @@ def signup():
 @app.route('/signout', methods=['POST'])
 def signout():
     email = request.json.get('email')
+    print(f"Signout request for: {email}")
     user = User.query.filter_by(email=email).first()
     if user:
-        is_online=False
+        print(f"Found user: {user.email}")
         user.is_online = False
         db.session.commit()
     return jsonify({'message': 'Signed out successfully'}), 200

@@ -155,13 +155,13 @@ function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      const userId = localStorage.getItem('user_id');
+      const email = localStorage.getItem('userEmail');
       await fetch(`${SERVER_URL}/signout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ email }),
       });
       localStorage.removeItem('userEmail');
       logout();
