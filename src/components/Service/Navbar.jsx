@@ -3,7 +3,8 @@ import {Button} from './Button';
 import { Link, useNavigate } from 'react-router-dom'; // עדכון הייבוא
 import styled from 'styled-components';
 import { useContext } from 'react';
-import { UserContext } from './UserContext';
+import { UserContext } from '../pages/UserSign/UserContext';
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const NavbarContainer = styled.nav`
   background: rgba(18, 17, 17, 0.6);
