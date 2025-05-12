@@ -207,6 +207,7 @@ def get_user_locations():
         {
             'id': user.id,
             'username': user.name,
+            'email': user.email,
             'lat': user.latitude,
             'lng': user.longitude,
             'profile_image': user.profile_pic  # או השם שאתה שומר בו את התמונה
