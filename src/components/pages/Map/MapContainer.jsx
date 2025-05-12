@@ -237,7 +237,7 @@ if (!isLoggedIn) {
                   }}
                   style={{ cursor: 'pointer', fontWeight: 'bold' }}
                 >
-                  {user.username}
+                  {user.name}
                 </div>
               </Popup>
             </Marker>
