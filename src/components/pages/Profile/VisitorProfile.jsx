@@ -27,7 +27,7 @@ const VisitorProfile = () => {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2>{userData.username}</h2>
+      <h2>{userData.name}</h2>
       <img
         src={`${SERVER_URL}/uploads/${userData.profile_pic}`}
         alt="Profile"
