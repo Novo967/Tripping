@@ -222,19 +222,23 @@ if (!isLoggedIn) {
               </Popup>
           </Marker>
           {allUsers.map(user => (
-            <Marker
+           <Marker
               key={user.id}
               position={[user.lat, user.lng]}
-              icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
-              eventHandlers={{
-                click: () => {
-                  console.log('navigating to:', `/visitor/${user.email}`);
-                  navigate(`/visitor/${encodeURIComponent(user.email)}`);
-                }
-              }}
+              icon={createProfileIcon(
+                user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null
+              )}
             >
               <Popup>
-                {user.username}
+                <div
+                  onClick={() => {
+                    console.log('navigating to:', `/visitor/${user.email}`);
+                    navigate(`/visitor/${encodeURIComponent(user.email)}`);
+                  }}
+                  style={{ cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  {user.username}
+                </div>
               </Popup>
             </Marker>
 
