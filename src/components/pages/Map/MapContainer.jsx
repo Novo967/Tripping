@@ -232,8 +232,8 @@ if (!isLoggedIn) {
               <Popup>
                 <div
                   onClick={() => {
-                    console.log('navigating to:', `/visitor/${user.email}`);
-                    navigate(`/visitor/${encodeURIComponent(user.email)}`);
+                    console.log('navigating to:', `/visitor/${localStorage.getItem('userEmail')}`);
+                    navigate(`/visitor/${encodeURIComponent(localStorage.getItem('userEmail'))}`);
                   }}
                   style={{ cursor: 'pointer', fontWeight: 'bold' }}
                 >
