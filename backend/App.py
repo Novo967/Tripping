@@ -241,12 +241,15 @@ def visitor_profile():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    # דוגמה - הוסף שדות שאתה רוצה
+    # שליפת תמונות מתוך טבלת Photo לפי user.id
+    photos = Photo.query.filter_by(user_id=user.id).all()
+
     return jsonify({
         'username': user.name,
         'profile_pic': user.profile_pic,
-        'gallery': [photo.filename for photo in user.photos]
+        'gallery': [photo.filename for photo in photos]
     })
+
 # Run the app
 if __name__ == '__main__':
     print("Starting Flask server...")
