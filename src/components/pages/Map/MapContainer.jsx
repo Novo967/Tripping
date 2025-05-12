@@ -226,18 +226,18 @@ if (!isLoggedIn) {
               key={user.id}
               position={[user.lat, user.lng]}
               icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
-               eventHandlers={{
-                click: () => navigate(`/visitor/${encodeURIComponent(user.email)}`)
+              eventHandlers={{
+                click: () => {
+                  console.log('navigating to:', `/visitor/${user.email}`);
+                  navigate(`/visitor/${encodeURIComponent(user.email)}`);
+                }
               }}
             >
               <Popup>
-                console.log('navigating to:', `/visitor/${user.email}`);
-                <div onClick={() => navigate(`/visitor/${user.email}`)} style={{ cursor: 'pointer' }}>
-                  <strong>{user.username}</strong><br />
-                  <small>Click to view profile</small>
-                </div>
+                {user.username}
               </Popup>
             </Marker>
+
           ))}
       </LeafletMap>
       </ServiceContainer>
