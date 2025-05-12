@@ -162,6 +162,7 @@ function Navbar() {
         },
         body: JSON.stringify({ userId }),
       });
+      localStorage.removeItem('userEmail');
       logout();
       navigate('/');
     } catch (error) {

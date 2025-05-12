@@ -119,7 +119,7 @@ const MapContainer = () => {
   const [userProfilePic, setUserProfilePic] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchUserProfile = async (latitude, longitude) => {
       const email = localStorage.getItem('userEmail');
@@ -127,7 +127,6 @@ const MapContainer = () => {
         try {
           const response = await axios.get(`${SERVER_URL}/profile?email=${email}`);
           setUserProfilePic(response.data.profile_pic);
-
           await axios.post(`${SERVER_URL}/api/update_location`, {
             email,
             latitude,
@@ -138,8 +137,10 @@ const MapContainer = () => {
             },
             withCredentials: true  // רק אם השרת דורש cookies/session
           });
+         
         } catch (error) {
           console.error('Error fetching profile picture:', error);
+          
           setIsLoggedIn(false);
         }
       }
@@ -156,6 +157,7 @@ const MapContainer = () => {
           console.log(position.coords);
           // ✅ Call a separate async function!
           fetchUserProfile(latitude, longitude);
+          console.log('email in storage:', localStorage.getItem('userEmail'));
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -199,6 +201,7 @@ if (!isLoggedIn) {
       </Message>
     );
   }
+
   return (
     <div className="map-placeholder">
       <ServiceContainer>

@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 # Initialize app and config
 app = Flask(__name__)
-CORS(app, origins=["https://tripping-1chmxyw1b-novs-projects-c22b7ac3.vercel.app"], supports_credentials=True)
+CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
@@ -73,6 +73,7 @@ def signin():
 
     if not check_password_hash(user.password, password):
         return jsonify({'error': 'Invalid password'}), 401
+
     user.is_online = True
     db.session.commit()
     
@@ -119,7 +120,7 @@ def get_profile():
         return jsonify({'error': 'Email required'}), 400
 
     user = User.query.filter_by(email=email).first()
-    if not user:
+    if not user.is_online or not user:
         return jsonify({'error': 'User not found'}), 404
 
    
