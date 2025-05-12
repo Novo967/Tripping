@@ -226,6 +226,9 @@ if (!isLoggedIn) {
               key={user.id}
               position={[user.lat, user.lng]}
               icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
+               eventHandlers={{
+                click: () => navigate(`/visitor/${encodeURIComponent(user.email)}`)
+              }}
             >
               <Popup>
                 <div onClick={() => navigate(`/visitor/${user.email}`)} style={{ cursor: 'pointer' }}>
