@@ -111,11 +111,6 @@ const createProfileIcon = (photoUrl) => {
   });
 };
 
-
-
-
-
-
 const MapContainer = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [userProfilePic, setUserProfilePic] = useState(null);
@@ -232,9 +227,10 @@ if (!isLoggedIn) {
               position={[user.lat, user.lng]}
               icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
             >
-              <Popup>
-                {user.username}
-              </Popup>
+              <div onClick={() => navigate(`/visitor/${user.email}`)} style={{ cursor: 'pointer' }}>
+                <strong>{user.username}</strong><br />
+                <small>Click to view profile</small>
+              </div>
             </Marker>
           ))}
       </LeafletMap>

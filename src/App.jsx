@@ -7,9 +7,11 @@ import Profile from './components/pages/Profile/ProfilePage';
 import SignUp from './components/pages/UserSign/SignUp';
 import Navbar from './components/Service/Navbar';
 import Footer from './components/Service/Footer';
+import VisitorProfile from './components/pages/Profile/VisitorProfile';
 import LogingIn from './/components/pages/UserSign/LogingIn';
 import 'leaflet/dist/leaflet.css';
 import { UserProvider } from './components/pages/UserSign/UserContext';
+
 // גלובלי לכל האפליקציה
 const GlobalStyle = createGlobalStyle`
   * {
@@ -47,6 +49,7 @@ function App() {
           <Route path='/profile' element={<Profile />} />
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/login' element={<LogingIn />} />
+          <Route path="/visitor/:email" element={<VisitorProfile />} />
         </Routes>
         <Footer />
       </Router>

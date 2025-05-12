@@ -233,6 +233,20 @@ def update_location():
     db.session.commit()
 
     return jsonify({'message': 'Location updated successfully'}), 200
+
+@app.route('/visitor_profile')
+def visitor_profile():
+    email = request.args.get('email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # דוגמה - הוסף שדות שאתה רוצה
+    return jsonify({
+        'username': user.username,
+        'profile_pic': user.profile_pic,
+        'gallery': [photo.filename for photo in user.photos]
+    })
 # Run the app
 if __name__ == '__main__':
     print("Starting Flask server...")
