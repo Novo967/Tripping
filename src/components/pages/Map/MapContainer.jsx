@@ -231,6 +231,7 @@ if (!isLoggedIn) {
               }}
             >
               <Popup>
+                console.log('navigating to:', `/visitor/${user.email}`);
                 <div onClick={() => navigate(`/visitor/${user.email}`)} style={{ cursor: 'pointer' }}>
                   <strong>{user.username}</strong><br />
                   <small>Click to view profile</small>
