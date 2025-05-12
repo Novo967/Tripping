@@ -1,15 +1,15 @@
 import React from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
-import Navbar from './components/Navbar';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './components/pages/Home';
-import MapPage from './components/pages/MapPage';
-import Profile from './components/pages/Profile';
-import SignUp from './components/pages/SignUp';
-import Footer from './components/Footer';
-import LogingIn from './components/pages/LogingIn';
+import Home from './components/pages/Home/HomePage';
+import MapPage from './components/pages/Map/MapPage';
+import Profile from './components/pages/Profile/ProfilePage';
+import SignUp from './components/pages/UserSign/SignUp';
+import Navbar from './components/Service/Navbar';
+import Footer from './components/Service/Footer';
+import LogingIn from './/components/pages/UserSign/LogingIn';
 import 'leaflet/dist/leaflet.css';
-import { UserProvider } from './components/UserContext';
+import { UserProvider } from './components/pages/UserSign/UserContext';
 // גלובלי לכל האפליקציה
 const GlobalStyle = createGlobalStyle`
   * {

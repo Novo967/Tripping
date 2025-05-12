@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../Button';
+import { Button } from '../../../Service/Button';
 
 function UploadPhoto() {
   const handleUpload = (e) => {

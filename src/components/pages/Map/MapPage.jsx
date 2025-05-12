@@ -1,5 +1,5 @@
 import React from 'react';
-import MapContainer from '../Service/MapContainer';
+import MapContainer from './MapContainer';
 
 const Service = () => {
   return (

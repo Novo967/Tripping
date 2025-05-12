@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer as LeafletMap, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { Button } from '../Button';
+import { Button } from '../../Service/Button.jsx';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const Message = styled.div`
   position: relative;

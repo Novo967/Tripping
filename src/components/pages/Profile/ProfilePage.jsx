@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import ProfileHeader from '../Profile/ProfileHeader';
-import UploadPhoto from '../Profile/UploadPhoto';
-import Gallery from '../Profile/Gallery';
-import { Button } from '../Button';
-import UploadForm from '../Profile/UploadForm';
-import UploadProfilePic from '../Profile/UploadProfilePic';
+import ProfileHeader from './ProfileServices/ProfileHeader';
+import UploadPhoto from './ProfileServices/UploadPhoto';
+import Gallery from './ProfileServices/Gallery';
+import { Button } from '../../Service/Button';
+import UploadForm from './ProfileServices/UploadForm';
+import UploadProfilePic from './ProfileServices/UploadProfilePic';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 

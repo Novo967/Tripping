@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import '../App.jsx'
-import { Button } from './Button';
+import '../../../App.jsx';
+import { Button } from '../../Service/Button.jsx';
 
 function HeroSection() {
   return (
