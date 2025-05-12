@@ -179,7 +179,7 @@ function Footer() {
       </SubscriptionBox>
       <SocialBar>
         <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          Triping <i className="fa-solid fa-location-dot" />
+          Tripping <i className="fa-solid fa-location-dot" />
         </Logo>
           © {new Date().getFullYear()} Triping. All rights reserved.
         <SocialIcons>
