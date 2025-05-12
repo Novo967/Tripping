@@ -227,10 +227,12 @@ if (!isLoggedIn) {
               position={[user.lat, user.lng]}
               icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
             >
-              <div onClick={() => navigate(`/visitor/${user.email}`)} style={{ cursor: 'pointer' }}>
-                <strong>{user.username}</strong><br />
-                <small>Click to view profile</small>
-              </div>
+              <Popup>
+                <div onClick={() => navigate(`/visitor/${user.email}`)} style={{ cursor: 'pointer' }}>
+                  <strong>{user.username}</strong><br />
+                  <small>Click to view profile</small>
+                </div>
+              </Popup>
             </Marker>
           ))}
       </LeafletMap>
