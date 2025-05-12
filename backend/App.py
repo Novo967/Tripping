@@ -243,7 +243,7 @@ def visitor_profile():
 
     # דוגמה - הוסף שדות שאתה רוצה
     return jsonify({
-        'username': user.username,
+        'username': user.name,
         'profile_pic': user.profile_pic,
         'gallery': [photo.filename for photo in user.photos]
     })
