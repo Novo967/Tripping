@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
 const FooterContainer = styled.footer`
-  background: rgba(18, 17, 17, 0.6);
+  background: #293A40;
   backdrop-filter: blur(8px);
   color: #f0f0f0;
   padding: 4rem 1rem 2rem;
@@ -67,6 +67,13 @@ const SubscriptionBox = styled.div`
     color: #ccc;
   }
 
+  form {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem; /* הרווח בין input לכפתור */
+  }
+
   input {
     padding: 0.6rem 1rem;
     border-radius: 25px;
@@ -74,22 +81,23 @@ const SubscriptionBox = styled.div`
     font-size: 1rem;
     width: 250px;
     max-width: 90%;
+    background-color: #fff;
+    color: #333;
   }
 
   @media (max-width: 768px) {
-    input {
-      margin-bottom: 1rem;
-      margin-right: 0;
+    form {
+      flex-direction: column;
+      align-items: center;
     }
 
-    form {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+    input, button {
+      width: 100%;
+      max-width: 300px;
     }
   }
 `;
+
 
 const SocialBar = styled.div`
   display: flex;

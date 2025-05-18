@@ -1,73 +1,82 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import { Button } from '../../Service/Button.jsx';
-
-// Styled Components
-const Container = styled.section`
-  position: relative;
-  padding: 6rem 2rem 4rem;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(38, 47, 55, 0.7)),
-    url('/images/backgroundTravel.jpg') center/cover no-repeat;
-  color: white;
-  overflow: hidden;
-  height: 600px;
-  border-top: 30px solid transparent;
-
-  &::before {
-    content: "";
-    position: absolute;
-    top: -30px;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    z-index: 1;
-  }
-`;
-
-const InnerContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 1120px;
-  width: 90%;
-  margin: 0 auto;
-  position: relative;
-  z-index: 3;
-`;
-
-const HeroText = styled.h2`
-  color: white;
-  font-size: 3rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-`;
-
-const SubText = styled.p`
-  color: #e0e0e0;
-  font-size: 1.2rem;
-  text-align: center;
-  max-width: 700px;
-  margin-bottom: 2.5rem;
-`;
 
 function SecondSection() {
   return (
     <Container>
-      <InnerContainer>
-        <HeroText>Make friends easy, any time, any place</HeroText>
-        <SubText>With Triping you can explore new people around the World</SubText>
-        <Button className='btns' to='/login' buttonStyle='btn--outline' buttonSize='btn--large'>
-          Get Started <i className="fas fa-map-marker-alt" />
-        </Button>
-      </InnerContainer>
+      <ContentWrapper>
+        <TextContainer>
+          <Title>About Triping</Title>
+          <Description>
+            Triping helps travelers connect with others nearby, share their journeys, and find new companions across the globe.
+            Whether you're exploring alone or with friends, you'll always have someone to meet along the way.
+          </Description>
+        </TextContainer>
+        <ImageContainer>
+          <StyledImage src="/images/backgroundTravel.jpg" alt="Travel background" />
+        </ImageContainer>
+      </ContentWrapper>
     </Container>
   );
 }
+
+// Styled Components
+const Container = styled.section`
+  background-color: #feb47b;
+  color: white;
+  padding: 5rem 2rem;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 3rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+`;
+
+const TextContainer = styled.div`
+  flex: 1;
+`;
+
+const Title = styled.h2`
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 2.2rem;
+  }
+`;
+
+const Description = styled.p`
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: #293A40;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+`;
+
+const ImageContainer = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+`;
+
+const StyledImage = styled.img`
+  width: 100%;
+  max-width: 320px;
+  transform: rotate(8deg);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+`;
 
 export default SecondSection;

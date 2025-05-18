@@ -7,7 +7,7 @@ import { UserContext } from '../pages/UserSign/UserContext';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const NavbarContainer = styled.nav`
-  background: rgba(18, 17, 17, 0.6);
+  background: #293A40;
   height: 80px;
   width: 100%;
   display: flex;
@@ -39,7 +39,7 @@ const Logo = styled(Link)`
   font-weight: bold;
   i {
     margin-left: 8px;
-    color:rgb(254, 197, 123);
+    color: #feb47b;
   }
 `;
 

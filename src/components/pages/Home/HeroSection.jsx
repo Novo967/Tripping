@@ -6,11 +6,11 @@ import { Button } from '../../Service/Button.jsx';
 function HeroSection() {
   return (
     <HeroContainer>
-      <video src="/videos/video-5.mp4" autoPlay loop muted />
       <Overlay />
       <BottomGradient />
       <Content>
-        <h1>Explore travelers around you</h1>
+        <h1>Explore travelers</h1>
+        <h2>Around you</h2>
         <p>Join the community</p>
         <HeroButtons>
           <Button className='btns' to='/login' buttonStyle='btn--outline' buttonSize='btn--large'>
@@ -25,23 +25,13 @@ function HeroSection() {
   );
 }
 
-const HeroContainer = styled.section`
+  const HeroContainer = styled.section`
   position: relative;
   height: 100vh;
   width: 100%;
   overflow: hidden;
-
-  video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: scale(1);
-    object-fit: cover;
-    filter: none;
-    z-index: -2;
-  }
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), 
+            url('/images/heroSectionPic.jpg') center/cover no-repeat;
 `;
 
 const Overlay = styled.div`
@@ -77,22 +67,43 @@ const Content = styled.div`
   padding: 0 40px;
 
   h1 {
-    font-size: 4rem;
-    padding-top: 20vh;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    transition: 0.3s;
+  font-size: 4.15rem;
+  font-weight: 800;
+  margin: 0;
+  color: #fff;
+  letter-spacing: 1px;
+  padding-top: 20vh;
 
-    @media screen and (max-width: 960px) {
-      font-size: 3rem;
-    }
-
-    @media screen and (max-width: 600px) {
-      font-size: 2.2rem;
-    }
+  @media screen and (max-width: 960px) {
+    font-size: 2.4rem;
   }
 
+  @media screen and (max-width: 600px) {
+    font-size: 2rem;
+  }
+}
+
+h2 {
+  font-size: 7rem;
+  font-weight: 700;
+  margin: 0rem 0 2rem;
+  color: #feb47b;
+  line-height: 1.2;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.4);
+
+  @media screen and (max-width: 960px) {
+    font-size: 4rem;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 3rem;
+  }
+}
+
+
   p {
+    color: #fff;
     font-size: 1.5rem;
     margin-bottom: 2rem;
     opacity: 0.9;
