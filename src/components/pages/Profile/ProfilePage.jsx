@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import ProfileHeader from './ProfileServices/ProfileHeader';
+import UploadProfilePic from './ProfileServices/UploadProfilePic';
+import UploadForm from './ProfileServices/UploadForm';
 import Gallery from './ProfileServices/Gallery';
 import { Button } from '../../Service/Button';
-import UploadForm from './ProfileServices/UploadForm';
-import UploadProfilePic from './ProfileServices/UploadProfilePic';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -47,7 +46,7 @@ function Profile() {
           Register
         </Button>
         <BottomLink>
-          Already have an account? <a onClick={() => navigate('/login')}>Log in</a>
+          Already have an acount? <a onClick={() => navigate('/login')}>Sign in</a>
         </BottomLink>
       </Message>
     );
@@ -56,136 +55,131 @@ function Profile() {
   if (!profile) return <Loading>טוען פרופיל...</Loading>;
 
   return (
-    <Container>
-      <Cover />
-      <ProfileSection>
-        <ProfileImage>
-          <img
-            src={`${SERVER_URL}/uploads/${profile.profile_pic}`}
-            alt="Profile"
-          />
-        </ProfileImage>
-        <h2>{profile.name}</h2>
-        <StyledFollowersInfo>
-          <div>
-            <span className="count">{profile.followers}</span>
-            <span className="label">Followers</span>
-          </div>
-          <div>
-            <span className="count">{profile.following}</span>
-            <span className="label">Following</span>
-          </div>
-        </StyledFollowersInfo>
-      </ProfileSection>
+    <Page>
+      <Container>
+        <BackButton onClick={() => navigate(-1)}>← חזור</BackButton>
 
-      <UploadProfilePic
-        onUploadSuccess={(newFilename) =>
-          setProfile((prev) => ({
-            ...prev,
-            profile_pic: newFilename,
-          }))
-        }
-      />
+        <Header>
+          <ProfilePic src={`${SERVER_URL}/uploads/${profile.profile_pic}`} alt="Profile" />
+          <UserInfo>
+            <Name>{profile.name}</Name>
+            {profile.location && <Location>📍 {profile.location}</Location>}
+            {profile.bio && <Bio>{profile.bio}</Bio>}
+          </UserInfo>
+        </Header>
+        <UploadProfilePic
+          onUploadSuccess={(newFilename) =>
+            setProfile((prev) => ({
+              ...prev,
+              profile_pic: newFilename,
+            }))
+          }
+        />
 
-      <UploadForm
-        email={profile.email}
-        onUploadSuccess={(newPhoto) =>
-          setProfile((prev) => ({
-            ...prev,
-            photos: [...(prev.photos || []), newPhoto],
-          }))
-        }
-      />
+        <UploadForm
+          email={profile.email}
+          onUploadSuccess={(newPhoto) =>
+            setProfile((prev) => ({
+              ...prev,
+              photos: [...(prev.photos || []), newPhoto],
+            }))
+          }
+        />
 
-      <Gallery
-        photos={profile.photos || []}
-        email={profile.email}
-        onUploadSuccess={(newPhoto) =>
-          setProfile((prev) => ({
-            ...prev,
-            photos: [...(prev.photos || []), newPhoto],
-          }))
-        }
-      />
-    </Container>
+        <Gallery
+          photos={profile.photos || []}
+          email={profile.email}
+          onUploadSuccess={(newPhoto) =>
+            setProfile((prev) => ({
+              ...prev,
+              photos: [...(prev.photos || []), newPhoto],
+            }))
+          }
+        />
+      </Container>
+    </Page>
   );
 }
 
 export default Profile;
 
 // styled-components
+const Page = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(to right, #f7f8fc, #e8ecf3);
+  padding-top: 80px;
+  padding-bottom: 40px;
+`;
+
 const Container = styled.div`
-  max-width: 900px;
-  margin: 2rem auto;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 2rem;
-  background: linear-gradient(to bottom right, #ecf7fa, #f3fcff);
-  border-radius: 24px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
 `;
 
-const Cover = styled.div`
-  height: 180px;
-  background: linear-gradient(to right, #6dd5ed, #2193b0);
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: #2980b9;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  padding-left: 0.2rem;
 `;
 
-const ProfileSection = styled.div`
+const Header = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  margin-top: -70px;
-
-  h2 {
-    font-size: 2rem;
-    color: #222;
-    margin-top: 0.5rem;
-  }
+  margin-bottom: 2rem;
+  text-align: center;
+  gap: 1rem;
 `;
 
-const ProfileImage = styled.div`
-  width: 120px;
-  height: 120px;
-  border: 5px solid white;
+const ProfilePic = styled.img`
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
   border-radius: 50%;
-  overflow: hidden;
-  background-color: #eee;
-  box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 `;
 
-const StyledFollowersInfo = styled.div`
+const UserInfo = styled.div`
   margin-top: 1rem;
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  align-items: center;
-  background: #f0fbff;
+  background-color: #ffffffdd;
   padding: 1rem 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  max-width: 90%;
+`;
 
-  div {
-    text-align: center;
-  }
+const Name = styled.h2`
+  font-size: 2.2rem;
+  margin-top: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+`;
 
-  .count {
-    display: block;
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #0077b6;
-  }
+const Location = styled.p`
+  font-size: 1rem;
+  color: #666;
+  margin-top: 0.3rem;
+`;
 
-  .label {
-    font-size: 0.9rem;
-    color: #555;
-  }
+const Bio = styled.p`
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #444;
+  max-width: 600px;
+`;
+
+const ButtonWrapper = styled.div`
+  margin-top: 1.2rem;
+  background: none;
+  padding: 0;
+  display: inline-block;
 `;
 
 const Loading = styled.div`

@@ -9,6 +9,9 @@ import Navbar from './components/Service/Navbar';
 import Footer from './components/Service/Footer';
 import VisitorProfile from './components/pages/Profile/VisitorProfile';
 import LogingIn from './/components/pages/UserSign/LogingIn';
+import OurStory from './components/pages/AboutUs/OurStory';
+import Careers from './components/pages/AboutUs/Carrers';
+import Contact from './components/pages/AboutUs/Contact';
 import 'leaflet/dist/leaflet.css';
 import { UserProvider } from './components/pages/UserSign/UserContext';
 
@@ -50,6 +53,9 @@ function App() {
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/login' element={<LogingIn />} />
           <Route path="/visitor/:email" element={<VisitorProfile />} />
+          <Route path="/OurStory" element={<OurStory />} />
+          <Route path="/Careers" element={<Careers />} />
+          <Route path="/Contact" element={<Contact />} />
         </Routes>
         <Footer />
       </Router>

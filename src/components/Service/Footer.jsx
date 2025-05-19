@@ -3,6 +3,58 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
+function Footer() {
+  return (
+    <FooterContainer>
+      <FooterTop>
+        <FooterSection>
+          <h3>About Us</h3>
+          <Link to='/ourStory'>Our Story</Link>
+          <Link to='/careers'>Careers</Link>
+          <Link to='/contact'>Contact</Link>
+        </FooterSection>
+
+        <FooterSection>
+          <h3>Explore</h3>
+          <Link to='/MapPage'>Map</Link>
+          <Link to='/ProfilePage'>Profiles</Link>
+          <Link to='/'>Communities</Link>
+        </FooterSection>
+
+        <FooterSection>
+          <h3>Follow</h3>
+          <a href='https://instagram.com'>Instagram</a>
+          <a href='https://facebook.com'>Facebook</a>
+          <a href='https://twitter.com'>Twitter</a>
+        </FooterSection>
+      </FooterTop>
+      <FooterBottom/>
+      <SubscriptionBox>
+        <h2>Stay Connected</h2>
+        <p>Get updates and news directly to your inbox</p>
+        <form>
+          <input type="email" placeholder="Enter your email" />
+          <Button buttonStyle='btn--outline'>Subscribe</Button>
+        </form>
+      </SubscriptionBox>
+      <SocialBar>
+        <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          Tripping <i className="fa-solid fa-location-dot" />
+        </Logo>
+          © {new Date().getFullYear()} Triping. All rights reserved.
+        <SocialIcons>
+          <Link to="#"><i className="fab fa-facebook-f" /></Link>
+          <Link to="#"><i className="fab fa-instagram" /></Link>
+          <Link to="#"><i className="fab fa-twitter" /></Link>
+          <Link to="#"><i className="fab fa-tiktok" /></Link>
+        </SocialIcons>
+      </SocialBar>
+    </FooterContainer>
+  );
+}
+
+export default Footer;
+
 const FooterContainer = styled.footer`
   background: #293A40;
   backdrop-filter: blur(8px);
@@ -98,7 +150,6 @@ const SubscriptionBox = styled.div`
   }
 `;
 
-
 const SocialBar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -151,55 +202,5 @@ const FooterBottom = styled.div`
   color: #aaa;
 `;
 
-function Footer() {
-  return (
-    <FooterContainer>
-      <FooterTop>
-        <FooterSection>
-          <h3>About Us</h3>
-          <Link to='/'>Our Story</Link>
-          <Link to='/'>Careers</Link>
-          <Link to='/'>Contact</Link>
-        </FooterSection>
 
-        <FooterSection>
-          <h3>Explore</h3>
-          <Link to='/'>Map</Link>
-          <Link to='/'>Profiles</Link>
-          <Link to='/'>Communities</Link>
-        </FooterSection>
-
-        <FooterSection>
-          <h3>Follow</h3>
-          <a href='https://instagram.com'>Instagram</a>
-          <a href='https://facebook.com'>Facebook</a>
-          <a href='https://twitter.com'>Twitter</a>
-        </FooterSection>
-      </FooterTop>
-      <FooterBottom/>
-      <SubscriptionBox>
-        <h2>Stay Connected</h2>
-        <p>Get updates and news directly to your inbox</p>
-        <form>
-          <input type="email" placeholder="Enter your email" />
-          <Button buttonStyle='btn--outline'>Subscribe</Button>
-        </form>
-      </SubscriptionBox>
-      <SocialBar>
-        <Logo to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          Tripping <i className="fa-solid fa-location-dot" />
-        </Logo>
-          © {new Date().getFullYear()} Triping. All rights reserved.
-        <SocialIcons>
-          <Link to="#"><i className="fab fa-facebook-f" /></Link>
-          <Link to="#"><i className="fab fa-instagram" /></Link>
-          <Link to="#"><i className="fab fa-twitter" /></Link>
-          <Link to="#"><i className="fab fa-tiktok" /></Link>
-        </SocialIcons>
-      </SocialBar>
-    </FooterContainer>
-  );
-}
-
-export default Footer;
 
