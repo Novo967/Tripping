@@ -270,12 +270,36 @@ const MapContainer = () => {
               </Marker>
             ))}
 
-            {/* הסיכות קבועות */}
-            {pins.map((pin, idx) => (
-              <Marker key={idx} position={[pin.lat, pin.lng]}>                
-                <Popup>{pin.message}</Popup>
+            
+            {/* הסיכות עם כפתור מחיקה ליוצר בלבד */}
+            {pins.map(pin => (
+              <Marker key={pin.id} position={[pin.lat, pin.lng]}>
+                <Popup>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>{pin.message}</span>
+                    {pin.email === localStorage.getItem('userEmail') && (
+                      <button
+                        style={{ marginTop: '8px', color: 'red', cursor: 'pointer' }}
+                        onClick={async () => {
+                          try {
+                            await axios.delete(
+                              `${SERVER_URL}/api/pins/${pin.id}`,
+                              { params: { email: localStorage.getItem('userEmail') } }
+                            );
+                            fetchPins();  // רענון הסיכות אחרי המחיקה
+                          } catch (err) {
+                            console.error('Error deleting pin:', err);
+                          }
+                        }}
+                      >
+                        🗑️ מחק סיכה
+                      </button>
+                    )}
+                  </div>
+                </Popup>
               </Marker>
             ))}
+
           </LeafletMap>
         </div>
       </ServiceContainer>

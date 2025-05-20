@@ -260,9 +260,16 @@ def visitor_profile():
 def get_pins():
     pins = Pin.query.all()
     return jsonify([
-        { 'lat': p.lat, 'lng': p.lng, 'message': p.message, 'email': p.email }
+        { 
+          'id': p.id,       # <–– נוסיף את ה-id
+          'lat': p.lat,
+          'lng': p.lng,
+          'message': p.message,
+          'email': p.email
+        }
         for p in pins
     ]), 200
+
 
 # הוספת סיכה חדשה
 @app.route('/api/pins', methods=['POST'])
@@ -281,6 +288,18 @@ def add_pin():
     db.session.commit()
 
     return jsonify({'status': 'success'}), 201
+@app.route('/api/pins/<int:pin_id>', methods=['DELETE'])
+def delete_pin(pin_id):
+    email = request.args.get('email')  # או מה־header/JSON, לפי העדפתך
+    pin = Pin.query.get(pin_id)
+    if not pin:
+        return jsonify({'error': 'Pin not found'}), 404
+    if pin.email != email:
+        return jsonify({'error': 'Not allowed'}), 403
+
+    db.session.delete(pin)
+    db.session.commit()
+    return jsonify({'status': 'deleted'}), 200
 
 # Run the app
 if __name__ == '__main__':
