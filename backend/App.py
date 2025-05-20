@@ -36,7 +36,12 @@ class User(db.Model):
     longitude = db.Column(db.Float)
     profile_pic = db.Column(db.String(255))  # <-- ADD THIS
     is_online = db.Column(db.Boolean, default=False)
-
+class Pin(db.Model):
+    id      = db.Column(db.Integer, primary_key=True)
+    email   = db.Column(db.String(120), nullable=False)
+    lat     = db.Column(db.Float,   nullable=False)
+    lng     = db.Column(db.Float,   nullable=False)
+    message = db.Column(db.Text,    nullable=False)
 # Create tables
 with app.app_context():
     db.create_all()
@@ -250,6 +255,32 @@ def visitor_profile():
         'profile_pic': user.profile_pic,
         'gallery': [photo.filename for photo in photos]
     })
+# קבלת כל הסיכות
+@app.route('/api/pins', methods=['GET'])
+def get_pins():
+    pins = Pin.query.all()
+    return jsonify([
+        { 'lat': p.lat, 'lng': p.lng, 'message': p.message, 'email': p.email }
+        for p in pins
+    ]), 200
+
+# הוספת סיכה חדשה
+@app.route('/api/pins', methods=['POST'])
+def add_pin():
+    data = request.get_json()
+    lat     = data.get('lat')
+    lng     = data.get('lng')
+    message = data.get('message')
+    email   = data.get('email')
+
+    if not (lat and lng and message and email):
+        return jsonify({'error': 'Missing fields'}), 400
+
+    new_pin = Pin(email=email, lat=lat, lng=lng, message=message)
+    db.session.add(new_pin)
+    db.session.commit()
+
+    return jsonify({'status': 'success'}), 201
 
 # Run the app
 if __name__ == '__main__':
