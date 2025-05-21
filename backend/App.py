@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import os
 from flask import Flask, request, jsonify, send_from_directory
+from datetime import datetime, date, timedelta
 from werkzeug.utils import secure_filename
 
 
@@ -44,7 +45,7 @@ class Pin(db.Model):
     message  = db.Column(db.Text,    nullable=False)
     type     = db.Column(db.String(50))
     date     = db.Column(db.Date)
-
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user = db.relationship('User', backref='pins')
 
 # Create tables
@@ -65,7 +66,21 @@ def allowed_file(filename):
 
 
 
+def cleanup_pins():
+    today = date.today()
+    one_day_ago = today - timedelta(days=1)
+    one_week_ago = datetime.utcnow() - timedelta(weeks=1)
 
+    # מחיקת אירועים שבפועל עברו
+    old_events = Pin.query.filter(Pin.date < one_day_ago).all()
+    # מחיקת פינים ישנים (גם אם התאריך עתידי) שיצאו לפני יותר משבוע
+    old_created = Pin.query.filter(Pin.created_at < one_week_ago).all()
+
+    # נמחוק את כל הפינים שנמצאו
+    for pin in set(old_events + old_created):
+        db.session.delete(pin)
+    if old_events or old_created:
+        db.session.commit()
 
 # Sign-in route
 @app.route('/signin', methods=['POST'])
@@ -263,6 +278,7 @@ def visitor_profile():
 # קבלת כל הסיכות
 @app.route('/api/pins', methods=['GET'])
 def get_pins():
+    cleanup_pins() 
     pins = Pin.query.all()
     result = []
     for p in pins:
@@ -280,35 +296,41 @@ def get_pins():
 
 
 # הוספת סיכה חדשה
+from datetime import datetime
+
 @app.route('/api/pins', methods=['POST'])
 def add_pin():
-    data = request.get_json()
+    data    = request.get_json()
     lat     = data.get('lat')
     lng     = data.get('lng')
     message = data.get('message')
+    pin_type= data.get('type')
+    pin_date_str = data.get('date')
     email   = data.get('email')
 
-    if not (lat and lng and message and email):
-        return jsonify({'error': 'Missing fields'}), 400
-
-    # שליפת המשתמש לפי אימייל
+    # בדיקות בסיסיות...
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    # יצירת הסיכה החדשה עם user_id
+    # המרת התאריך
+    try:
+        pin_date = datetime.fromisoformat(pin_date_str).date()
+    except:
+        return jsonify({'error': 'Invalid date format'}), 400
+
     new_pin = Pin(
         user_id = user.id,
         lat     = lat,
         lng     = lng,
-        message = message
+        message = message,
+        type    = pin_type,
+        date    = pin_date
     )
-
-    # הוספה ושמירה בבסיס
     db.session.add(new_pin)
     db.session.commit()
-
     return jsonify({'status': 'success'}), 201
+
 
 @app.route('/api/pins/<int:pin_id>', methods=['DELETE'])
 def delete_pin(pin_id):

@@ -208,7 +208,7 @@ const MapContainer = () => {
                 <Marker key={pin.id} position={[pin.lat, pin.lng]}>
                   <Popup>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <strong>מהות: {pin.type}</strong>
+                      <strong> {pin.type}</strong>
                       <span>תאריך: {new Date(pin.date).toLocaleDateString('he-IL')}</span>
                       <p>{pin.message}</p>
                       <em
