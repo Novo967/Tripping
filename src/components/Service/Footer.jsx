@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Button } from './Button';
 
+
 function Footer() {
   return (
     <FooterContainer>
@@ -18,7 +19,7 @@ function Footer() {
           <h3>Explore</h3>
           <Link to='/MapPage'>Map</Link>
           <Link to='/ProfilePage'>Profiles</Link>
-          <Link to='/'>Communities</Link>
+          <Link to='/Communities'>Communities</Link>
         </FooterSection>
 
         <FooterSection>
