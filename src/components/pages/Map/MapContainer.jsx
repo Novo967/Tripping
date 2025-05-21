@@ -211,7 +211,12 @@ const MapContainer = () => {
                       <strong>מהות: {pin.type}</strong>
                       <span>תאריך: {new Date(pin.date).toLocaleDateString('he-IL')}</span>
                       <p>{pin.message}</p>
-                      <em>על ידי: {pin.username}</em>
+                      <em
+                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => navigate(`/visitor/${encodeURIComponent(pin.email)}`)}
+                      >
+                        על ידי: {pin.username}
+                      </em>
                       {pin.email === userEmail && (
                         <button onClick={async () => { await axios.delete(`${SERVER_URL}/api/pins/${pin.id}`, { params: { email: userEmail } }); fetchPins(); }} style={{ marginTop: '8px', color: 'red', cursor: 'pointer' }}>🗑️ מחק</button>
                       )}
