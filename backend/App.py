@@ -37,11 +37,16 @@ class User(db.Model):
     profile_pic = db.Column(db.String(255))  # <-- ADD THIS
     is_online = db.Column(db.Boolean, default=False)
 class Pin(db.Model):
-    id      = db.Column(db.Integer, primary_key=True)
-    email   = db.Column(db.String(120), nullable=False)
-    lat     = db.Column(db.Float,   nullable=False)
-    lng     = db.Column(db.Float,   nullable=False)
-    message = db.Column(db.Text,    nullable=False)
+    id       = db.Column(db.Integer, primary_key=True)
+    user_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    lat      = db.Column(db.Float,   nullable=False)
+    lng      = db.Column(db.Float,   nullable=False)
+    message  = db.Column(db.Text,    nullable=False)
+    type     = db.Column(db.String(50))
+    date     = db.Column(db.Date)
+
+    user = db.relationship('User', backref='pins')
+
 # Create tables
 with app.app_context():
     db.create_all()
@@ -259,16 +264,19 @@ def visitor_profile():
 @app.route('/api/pins', methods=['GET'])
 def get_pins():
     pins = Pin.query.all()
-    return jsonify([
-        { 
-          'id': p.id,       # <–– נוסיף את ה-id
-          'lat': p.lat,
-          'lng': p.lng,
-          'message': p.message,
-          'email': p.email
-        }
-        for p in pins
-    ]), 200
+    result = []
+    for p in pins:
+        result.append({
+            'id':       p.id,
+            'lat':      p.lat,
+            'lng':      p.lng,
+            'message':  p.message,
+            'email':    p.user.email,           # מתוך ה־relationship
+            'username': p.user.name,            # שם המשתמש
+            'type':     p.type,
+            'date':     p.date.isoformat() if p.date else None
+        })
+    return jsonify(result), 200
 
 
 # הוספת סיכה חדשה
@@ -283,20 +291,47 @@ def add_pin():
     if not (lat and lng and message and email):
         return jsonify({'error': 'Missing fields'}), 400
 
-    new_pin = Pin(email=email, lat=lat, lng=lng, message=message)
+    # שליפת המשתמש לפי אימייל
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # יצירת הסיכה החדשה עם user_id
+    new_pin = Pin(
+        user_id = user.id,
+        lat     = lat,
+        lng     = lng,
+        message = message
+    )
+
+    # הוספה ושמירה בבסיס
     db.session.add(new_pin)
     db.session.commit()
 
     return jsonify({'status': 'success'}), 201
+
 @app.route('/api/pins/<int:pin_id>', methods=['DELETE'])
 def delete_pin(pin_id):
-    email = request.args.get('email')  # או מה־header/JSON, לפי העדפתך
-    pin = Pin.query.get(pin_id)
+    # שולפים את ה־email שהקליינט שלח
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'error': 'Email required'}), 400
+
+    # שולפים את המשתמש לפי ה־email
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # שולפים את הפין על פי id (Session.get במקום Query.get)
+    pin = db.session.get(Pin, pin_id)
     if not pin:
         return jsonify({'error': 'Pin not found'}), 404
-    if pin.email != email:
+
+    # מוודאים שהיוצר של הפין הוא המשתמש הנוכחי
+    if pin.user_id != user.id:
         return jsonify({'error': 'Not allowed'}), 403
 
+    # מוחקים את הפין
     db.session.delete(pin)
     db.session.commit()
     return jsonify({'status': 'deleted'}), 200

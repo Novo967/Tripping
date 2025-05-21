@@ -5,7 +5,7 @@ import { Button } from '../../Service/Button.jsx';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
+import PinForm from './PinForm.jsx';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -123,184 +123,113 @@ const MapClickHandler = ({ onClick }) => {
 
 const MapContainer = () => {
   const [userLocation, setUserLocation] = useState(null);
-  const [userProfilePic, setUserProfilePic] = useState(null);
+  const [userProfilePic] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [showAddPin, setShowAddPin] = useState(false); // מצב נעיצת סיכה
-  const [pins, setPins] = useState([]);                // רשימת סיכות עם הודעות
+  const [pins, setPins] = useState([]);
+  const [pinMode, setPinMode] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
+  const [clickLocation, setClickLocation] = useState(null);
 
   const navigate = useNavigate();
+  const userEmail = localStorage.getItem('userEmail');
 
-  // Toggle מצב נעיצה
-  const toggleAddPin = () => {
-    setShowAddPin(prev => !prev);
+  const fetchPins = async () => {
+    try { const res = await axios.get(`${SERVER_URL}/api/pins`); setPins(res.data); }
+    catch (err) { console.error('Error fetching pins:', err); }
   };
 
-  // Handler ללחיצת מפה
-  const handleMapClick = async (e) => {
-  if (!showAddPin) return;
-  const { lat, lng } = e.latlng;
-  const message = prompt('מה ברצונך לשתף כאן?');
-
-  if (message && message.trim() !== '') {
-    const email = localStorage.getItem('userEmail');
-    try {
-      // שליחת סיכה לשרת
-      await axios.post(`${SERVER_URL}/api/pins`, {
-        lat,
-        lng,
-        message,
-        email
-      });
-
-      // עדכון הסיכות המקומיות מחדש מהשרת
-      fetchPins();
-    } catch (err) {
-      console.error('שגיאה בשליחת סיכה לשרת:', err);
-    }
-
-    setShowAddPin(false);
-  }
-};
-
-
-  // Fetch existing pins
-  const fetchPins = async () => {
-    try {
-      const res = await axios.get(`${SERVER_URL}/api/pins`);
-      setPins(res.data);
-    } catch (err) {
-      console.error('Error fetching pins:', err);
-    }
+  const fetchAllUsers = async () => {
+    try { const res = await axios.get(`${SERVER_URL}/api/locations`); setAllUsers(res.data); }
+    catch (err) { console.error('Error fetching users:', err); }
   };
 
   useEffect(() => {
-    // First load user location & profile
-    const fetchUserProfile = async (latitude, longitude) => {
-      const email = localStorage.getItem('userEmail');
-      if (!email) return setIsLoggedIn(false);
-      try {
-        const response = await axios.get(`${SERVER_URL}/profile?email=${email}`);
-        setUserProfilePic(response.data.profile_pic);
-        await axios.post(
-          `${SERVER_URL}/api/update_location`,
-          { email, latitude, longitude },
-          { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
-        );
-      } catch {
-        setIsLoggedIn(false);
-      }
-    };
-
+    fetchAllUsers();
+    fetchPins();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        pos => {
-          const { latitude, longitude } = pos.coords;
+        ({ coords: { latitude, longitude } }) => {
           setUserLocation({ latitude, longitude });
-          fetchUserProfile(latitude, longitude);
+          const email = userEmail;
+          if (email) {
+            axios.post(`${SERVER_URL}/api/update_location`, { email, latitude, longitude }, { withCredentials: true });
+          } else setIsLoggedIn(false);
         },
         console.error
       );
     }
   }, []);
 
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      try {
-        const res = await axios.get(`${SERVER_URL}/api/locations`);
-        setAllUsers(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchAllUsers();
-    fetchPins();
-  }, []);
+  const togglePinMode = () => {
+    const count = pins.filter(p => p.email === userEmail).length;
+    if (!pinMode && count >= 3) { alert('לא ניתן לדקור יותר מ־3 סיכות'); return; }
+    setPinMode(prev => !prev);
+    if (pinMode) setFormVisible(false);
+  };
 
-  if (!userLocation) return <div className="map-placeholder">Loading your location...</div>;
+  const handleMapClick = (e) => {
+    if (!pinMode) return;
+    setClickLocation(e.latlng);
+    setFormVisible(true);
+    setPinMode(false);
+  };
+
+  if (!userLocation) return <div>Loading your location...</div>;
   if (!isLoggedIn) return <Message>...please login</Message>;
 
   return (
-    <div className={`map-placeholder ${showAddPin ? 'pin-mode' : ''}`}>  
+    <div className={`map-placeholder ${pinMode ? 'pin-mode' : ''}`}>  
       <ServiceContainer>
         <div style={{ position: 'relative' }}>
-          <button
-            onClick={toggleAddPin}
-            style={{
-              position: 'absolute', top: 10, right: 10, padding: '10px 16px',
-              fontSize: '16px', backgroundColor: showAddPin ? '#ff6b6b' : '#4caf50',
-              color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', zIndex: 1000
-            }}
-          >
-            {showAddPin ? '❌ בטל נעיצה' : '📍 נעץ סיכה'}
+          <button onClick={togglePinMode} style={{ position:'absolute', top:10, right:10, zIndex:1000, padding:'12px', backgroundColor: pinMode ? '#ff6b6b' : '#4caf50', color:'#fff', border:'none', borderRadius:'8px' }}>
+            {pinMode ? '❌ ביטול' : '📍 נעץ סיכה'}
           </button>
 
-          <LeafletMap
-            center={[userLocation.latitude, userLocation.longitude]}
-            zoom={13}
-            style={{ height: '60vh', width: '100%' }}
-          >
-            {/* מאזינים ללחיצות מפה */}
+          <LeafletMap center={[userLocation.latitude, userLocation.longitude]} zoom={13} style={{ height:'60vh', width:'100%' }}>
             <MapClickHandler onClick={handleMapClick} />
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
 
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-
-            {/* מארקרים */}
-            <Marker
-              position={[userLocation.latitude, userLocation.longitude]}
-              icon={createProfileIcon(userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null)}
-            >
+            {/* מארקר המשתמש */}
+            <Marker position={[userLocation.latitude, userLocation.longitude]} icon={createProfileIcon(userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null)}>
               <Popup>You are here!</Popup>
             </Marker>
 
-            {allUsers.map(user => (
-              <Marker
-                key={user.id}
-                position={[user.lat, user.lng]}
-                icon={createProfileIcon(user.profile_image ? `${SERVER_URL}/uploads/${user.profile_image}` : null)}
-              >
-                <Popup>
-                  <div onClick={() => navigate(`/visitor/${encodeURIComponent(user.email)}`)} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
-                    {user.username}
-                  </div>
-                </Popup>
+            {/* מארקרי משתמשים אחרים */}
+            {allUsers.map(u => (
+              <Marker key={u.id} position={[u.lat, u.lng]} icon={createProfileIcon(u.profile_image ? `${SERVER_URL}/uploads/${u.profile_image}` : null)}>
+                <Popup><span onClick={() => navigate(`/visitor/${encodeURIComponent(u.email)}`)} style={{cursor:'pointer'}}>{u.username}</span></Popup>
               </Marker>
             ))}
 
-            
-            {/* הסיכות עם כפתור מחיקה ליוצר בלבד */}
-            {pins.map(pin => (
-              <Marker key={pin.id} position={[pin.lat, pin.lng]}>
-                <Popup>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span>{pin.message}</span>
-                    {pin.email === localStorage.getItem('userEmail') && (
-                      <button
-                        style={{ marginTop: '8px', color: 'red', cursor: 'pointer' }}
-                        onClick={async () => {
-                          try {
-                            await axios.delete(
-                              `${SERVER_URL}/api/pins/${pin.id}`,
-                              { params: { email: localStorage.getItem('userEmail') } }
-                            );
-                            fetchPins();  // רענון הסיכות אחרי המחיקה
-                          } catch (err) {
-                            console.error('Error deleting pin:', err);
-                          }
-                        }}
-                      >
-                        🗑️ מחק סיכה
-                      </button>
-                    )}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
+            {/* מארקרי סיכות עם פרטים מורחבים ושם משתמש */}
+            {pins.map(pin => {
+              return (
+                <Marker key={pin.id} position={[pin.lat, pin.lng]}>
+                  <Popup>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <strong>מהות: {pin.type}</strong>
+                      <span>תאריך: {new Date(pin.date).toLocaleDateString('he-IL')}</span>
+                      <p>{pin.message}</p>
+                      <em>על ידי: {pin.username}</em>
+                      {pin.email === userEmail && (
+                        <button onClick={async () => { await axios.delete(`${SERVER_URL}/api/pins/${pin.id}`, { params: { email: userEmail } }); fetchPins(); }} style={{ marginTop: '8px', color: 'red', cursor: 'pointer' }}>🗑️ מחק</button>
+                      )}
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
           </LeafletMap>
+
+          {/* טופס לאחר בחירת מיקום */}
+          <PinForm
+            visible={formVisible && clickLocation}
+            onCancel={() => setFormVisible(false)}
+            onSave={({ type, date, message }) => {
+              axios.post(`${SERVER_URL}/api/pins`, { lat: clickLocation.lat, lng: clickLocation.lng, type, date, message, email: userEmail }).then(() => { fetchPins(); setFormVisible(false); });
+            }}
+          />
         </div>
       </ServiceContainer>
     </div>
@@ -308,3 +237,5 @@ const MapContainer = () => {
 };
 
 export default MapContainer;
+
+
