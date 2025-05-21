@@ -183,7 +183,7 @@ const MapContainer = () => {
       <ServiceContainer>
         <div style={{ position: 'relative' }}>
           <button onClick={togglePinMode} style={{ position:'absolute', top:10, right:10, zIndex:1000, padding:'12px', backgroundColor: pinMode ? '#ff6b6b' : '#4caf50', color:'#fff', border:'none', borderRadius:'8px' }}>
-            {pinMode ? '❌ ביטול' : '📍 נעץ סיכה'}
+            {pinMode ? '❌' : '📍'}
           </button>
 
           <LeafletMap center={[userLocation.latitude, userLocation.longitude]} zoom={13} style={{ height:'60vh', width:'100%' }}>
