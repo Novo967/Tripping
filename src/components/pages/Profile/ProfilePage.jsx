@@ -78,12 +78,6 @@ function Profile() {
           </UserInfo>
         </Header>
 
-        <UploadForm
-          email={profile.email}
-          onUploadSuccess={(newPhoto) =>
-            setProfile((prev) => ({ ...prev, photos: [...(prev.photos || []), newPhoto] }))
-          }
-        />
 
         <Gallery
           photos={profile.photos || []}
