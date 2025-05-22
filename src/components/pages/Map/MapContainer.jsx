@@ -176,7 +176,24 @@ const MapContainer = () => {
   };
 
   if (!userLocation) return <div>Loading your location...</div>;
-  if (!isLoggedIn) return <Message>...please login</Message>;
+   if (!isLoggedIn) {
+    return (
+      <Message>
+        <video src="/videos/video-5.mp4" autoPlay loop muted />
+        <Overlay />
+        <BottomGradient />
+        <h2>It seems we don't know each other yet</h2>
+        <p>Let's create your profile</p>
+        <Button to='/sign-up' buttonStyle='btn--outline' buttonSize='btn--large'>
+          Register
+        </Button>
+        <BottomLink>
+          Already have an account? <a onClick={() => navigate('/login')}>Log in</a>
+        </BottomLink>
+      </Message>
+    );
+  }
+
 
   return (
     <div className={`map-placeholder ${pinMode ? 'pin-mode' : ''}`}>  

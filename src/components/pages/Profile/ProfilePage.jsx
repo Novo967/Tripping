@@ -60,29 +60,28 @@ function Profile() {
         <BackButton onClick={() => navigate(-1)}>← חזור</BackButton>
 
         <Header>
-          <ProfilePic src={`${SERVER_URL}/uploads/${profile.profile_pic}`} alt="Profile" />
+          <PictureWrapper>
+            <ProfilePic src={`${SERVER_URL}/uploads/${profile.profile_pic}`} alt="Profile" />
+            <StyledUpload>
+              <UploadProfilePic
+                onUploadSuccess={(newFilename) =>
+                  setProfile((prev) => ({ ...prev, profile_pic: newFilename }))
+                }
+              />
+            </StyledUpload>
+          </PictureWrapper>
+
           <UserInfo>
             <Name>{profile.name}</Name>
             {profile.location && <Location>📍 {profile.location}</Location>}
             {profile.bio && <Bio>{profile.bio}</Bio>}
           </UserInfo>
         </Header>
-        <UploadProfilePic
-          onUploadSuccess={(newFilename) =>
-            setProfile((prev) => ({
-              ...prev,
-              profile_pic: newFilename,
-            }))
-          }
-        />
 
         <UploadForm
           email={profile.email}
           onUploadSuccess={(newPhoto) =>
-            setProfile((prev) => ({
-              ...prev,
-              photos: [...(prev.photos || []), newPhoto],
-            }))
+            setProfile((prev) => ({ ...prev, photos: [...(prev.photos || []), newPhoto] }))
           }
         />
 
@@ -90,10 +89,7 @@ function Profile() {
           photos={profile.photos || []}
           email={profile.email}
           onUploadSuccess={(newPhoto) =>
-            setProfile((prev) => ({
-              ...prev,
-              photos: [...(prev.photos || []), newPhoto],
-            }))
+            setProfile((prev) => ({ ...prev, photos: [...(prev.photos || []), newPhoto] }))
           }
         />
       </Container>
@@ -138,12 +134,25 @@ const Header = styled.div`
   gap: 1rem;
 `;
 
-const ProfilePic = styled.img`
+const PictureWrapper = styled.div`
+  position: relative;
   width: 140px;
   height: 140px;
+`;
+
+const ProfilePic = styled.img`
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const StyledUpload = styled.div`
+  position: absolute;
+  bottom: 5px;  /* Move up by half the button's height */
+  right: 5px;   /* Move left by half the button's width */
+  z-index: 2;     /* Above the profile image */
 `;
 
 const UserInfo = styled.div`
@@ -173,13 +182,6 @@ const Bio = styled.p`
   margin-top: 0.5rem;
   color: #444;
   max-width: 600px;
-`;
-
-const ButtonWrapper = styled.div`
-  margin-top: 1.2rem;
-  background: none;
-  padding: 0;
-  display: inline-block;
 `;
 
 const Loading = styled.div`

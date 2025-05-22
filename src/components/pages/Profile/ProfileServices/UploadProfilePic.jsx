@@ -1,27 +1,21 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const UploadProfilePic = ({ onUploadSuccess }) => {
-  const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     setMessage('');
-  };
-
-  const handleUpload = async (e) => {
-    e.preventDefault();
-
-    if (!file) {
-      setMessage("Please select a file first.");
-      return;
-    }
-
     const formData = new FormData();
     formData.append('photo', file);
     formData.append('email', localStorage.getItem('userEmail'));
@@ -31,7 +25,6 @@ const UploadProfilePic = ({ onUploadSuccess }) => {
       const res = await axios.post(`${SERVER_URL}/upload_profile_pic`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setFile(null);
       onUploadSuccess(res.data.filename);
     } catch (err) {
       console.error(err);
@@ -42,23 +35,25 @@ const UploadProfilePic = ({ onUploadSuccess }) => {
   };
 
   return (
-    <Form onSubmit={handleUpload}>
-      <Controls>
-        <HiddenInput
-          ref={fileInputRef}
-          id="fileInput"
-          name="photo"
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-        />
-        <SmallButton type="button" onClick={() => fileInputRef.current.click()}>
-          Choose File
-        </SmallButton>
-        <SmallButton type="submit" disabled={uploading}>
-          {uploading ? 'Uploading...' : 'Upload Photo'}
-        </SmallButton>
-      </Controls>
+    <Form>
+      <HiddenInput
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+      <CircleButton
+        onClick={() => {
+          if (!uploading) {
+            setMessage('');
+            fileInputRef.current.click();
+          }
+        }}
+        disabled={uploading}
+        title="Edit Profile Picture"
+      >
+        <FontAwesomeIcon icon={faPen} size="1px" />
+      </CircleButton>
       {message && <Message>{message}</Message>}
     </Form>
   );
@@ -67,40 +62,32 @@ const UploadProfilePic = ({ onUploadSuccess }) => {
 export default UploadProfilePic;
 
 // styled-components
-const Form = styled.form`
+const Form = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 20px 0;
-  padding: 12px;
-  background-color: #f9f9f9;
-  justify-content: center;
-  flex-direction: column;
-`;
-
-const Controls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
 `;
 
 const HiddenInput = styled.input`
   display: none;
 `;
 
-const SmallButton = styled.button`
-  padding: 3px 6px;
-  border-radius: 5px;
-  font-size: 12px;
+const CircleButton = styled.button`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background-color: #3498db;
   color: white;
   border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: background-color 0.2s;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #2980b9;
   }
-
   &:disabled {
     background-color: #aaa;
     cursor: not-allowed;
@@ -110,5 +97,5 @@ const SmallButton = styled.button`
 const Message = styled.p`
   font-size: 0.9rem;
   color: #333;
-  margin-top: 8px;
+  margin: 0;
 `;
