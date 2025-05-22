@@ -155,17 +155,17 @@ const StyledUpload = styled.div`
 `;
 
 const UserInfo = styled.div`
-  margin-top: 1rem;
-  background-color: #ffffffdd;
-  padding: 1rem 2rem;
+  
+  background-color: none;
+  
   border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  
   max-width: 90%;
 `;
 
 const Name = styled.h2`
-  font-size: 2.2rem;
-  margin-top: 1rem;
+  font-size: 2rem;
+  margin-top: 0.1rem;
   font-weight: 700;
   color: #1a1a1a;
 `;
