@@ -157,9 +157,7 @@ const StyledUpload = styled.div`
 const UserInfo = styled.div`
   
   background-color: none;
-  
   border-radius: 16px;
-  
   max-width: 90%;
 `;
 
