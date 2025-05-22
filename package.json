@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/core": "^7.2.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
@@ -24,7 +26,7 @@
     "react-i18next": "^15.5.1",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^6.30.0",
-    "react-scripts": "^3.0.1",
+    "react-scripts": "^5.0.1",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
