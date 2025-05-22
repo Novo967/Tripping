@@ -47,7 +47,26 @@ class Pin(db.Model):
     date     = db.Column(db.Date)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user = db.relationship('User', backref='pins')
+class Chat(db.Model):
+    __tablename__ = 'chats'
+    id          = db.Column(db.Integer, primary_key=True)
+    user1_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user2_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
 
+    __table_args__ = (
+        db.UniqueConstraint('user1_id', 'user2_id', name='unique_chat_pair'),
+    )
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id         = db.Column(db.Integer, primary_key=True)
+    chat_id    = db.Column(db.Integer, db.ForeignKey('chats.id'), nullable=False)
+    sender_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text       = db.Column(db.Text, nullable=False)
+    timestamp  = db.Column(db.DateTime, default=datetime.utcnow)
+
+    chat       = db.relationship('Chat', backref='messages')
 # Create tables
 with app.app_context():
     db.create_all()
@@ -271,10 +290,11 @@ def visitor_profile():
     photos = Photo.query.filter_by(user_id=user.id).all()
 
     return jsonify({
+        'id': user.id,
         'username': user.name,
         'profile_pic': user.profile_pic,
         'gallery': [photo.filename for photo in photos]
-    })
+    }), 200
 # קבלת כל הסיכות
 @app.route('/api/pins', methods=['GET'])
 def get_pins():
@@ -357,7 +377,7 @@ def delete_pin(pin_id):
     db.session.delete(pin)
     db.session.commit()
     return jsonify({'status': 'deleted'}), 200
-    
+
 @app.route('/api/photo', methods=['DELETE'])
 def delete_photo():
     data     = request.get_json()
@@ -391,6 +411,63 @@ def delete_photo():
     db.session.commit()
 
     return jsonify({'status': 'deleted'}), 200
+
+@app.route('/api/chats/with/<int:other_id>', methods=['GET'])
+def get_or_create_chat(other_id):
+    my_email = request.args.get('email')
+    me = User.query.filter_by(email=my_email).first_or_404()
+
+    u1, u2 = sorted([me.id, other_id])
+    chat = Chat.query.filter_by(user1_id=u1, user2_id=u2).first()
+    if not chat:
+        chat = Chat(user1_id=u1, user2_id=u2)
+        db.session.add(chat)
+        db.session.commit()
+
+    msgs = Message.query.filter_by(chat_id=chat.id).order_by(Message.timestamp).all()
+    return jsonify({
+        'chat_id': chat.id,
+        'messages': [
+            {
+                'id': msg.id,
+                'sender_id': msg.sender_id,
+                'sender_email': User.query.get(msg.sender_id).email,  # ודאו שאתם מסירים כל '+' מיותר
+                'text': msg.text,
+                'timestamp': msg.timestamp.isoformat()
+            }
+            for msg in msgs
+        ]
+    }), 200
+
+
+
+
+@app.route('/api/chats/<int:chat_id>/messages', methods=['POST'])
+def post_message(chat_id):
+    data = request.get_json()
+    my_email = data.get('email')
+    text     = data.get('text', '').strip()
+    if not text:
+        return jsonify({'error': 'Empty message'}), 400
+
+    me = User.query.filter_by(email=my_email).first_or_404()
+    chat = Chat.query.get_or_404(chat_id)
+
+    # וידוא שכולל אותנו
+    if me.id not in (chat.user1_id, chat.user2_id):
+        return jsonify({'error': 'Not part of chat'}), 403
+
+    msg = Message(chat_id=chat.id, sender_id=me.id, text=text)
+    db.session.add(msg)
+    db.session.commit()
+
+    return jsonify({
+        'id': msg.id,
+        'sender_id': msg.sender_id,
+        'text': msg.text,
+        'timestamp': msg.timestamp.isoformat()
+    }), 201
+
 # Run the app
 if __name__ == '__main__':
     print("Starting Flask server...")
