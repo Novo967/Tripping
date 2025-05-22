@@ -85,6 +85,11 @@ function Profile() {
           onUploadSuccess={(newPhoto) =>
             setProfile((prev) => ({ ...prev, photos: [...(prev.photos || []), newPhoto] }))
           }
+          onDeletePhoto={(filename) =>
+            setProfile(prev => ({
+              ...prev,
+              photos: prev.photos.filter(p => p.filename !== filename)}))
+          }
         />
       </Container>
     </Page>

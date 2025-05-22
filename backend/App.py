@@ -357,7 +357,40 @@ def delete_pin(pin_id):
     db.session.delete(pin)
     db.session.commit()
     return jsonify({'status': 'deleted'}), 200
+    
+@app.route('/api/photo', methods=['DELETE'])
+def delete_photo():
+    data     = request.get_json()
+    filename = data.get('filename')
+    email    = data.get('email')
 
+    # בדיקת קלט
+    if not filename or not email:
+        return jsonify({'error': 'Missing filename or email'}), 400
+
+    # מציאת המשתמש
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # מציאת הרשומה בטבלת Photo
+    photo = Photo.query.filter_by(user_id=user.id, filename=filename).first()
+    if not photo:
+        return jsonify({'error': 'Photo not found'}), 404
+
+    # מחיקת הקובץ מהדיסק
+    try:
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(path):
+            os.remove(path)
+    except Exception as e:
+        app.logger.error(f"Error deleting file {filename}: {e}")
+
+    # מחיקת הרשומה מה-DB
+    db.session.delete(photo)
+    db.session.commit()
+
+    return jsonify({'status': 'deleted'}), 200
 # Run the app
 if __name__ == '__main__':
     print("Starting Flask server...")

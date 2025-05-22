@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import UploadForm from '../ProfileServices/UploadForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 /**
@@ -8,11 +12,28 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
  * photos: array of { filename }
  * email: string
  * onUploadSuccess: fn
+ * onDeletePhoto: fn to update parent state after deletion
  */
-const Gallery = ({ photos, email, onUploadSuccess }) => {
+const Gallery = ({ photos, email, onUploadSuccess, onDeletePhoto }) => {
   const [modalImg, setModalImg] = useState(null);
-  const openModal = (url) => setModalImg(url);
+  const [currentFile, setCurrentFile] = useState(null);
+  const openModal = (photo) => {
+    setCurrentFile(photo.filename);
+    setModalImg(`${SERVER_URL}/uploads/${photo.filename}`);
+  };
   const closeModal = () => setModalImg(null);
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${SERVER_URL}/api/photo`, {
+        data: { filename: currentFile, email }
+      });
+      onDeletePhoto(currentFile);
+      closeModal();
+    } catch (err) {
+      console.error('Error deleting photo:', err);
+    }
+  };
 
   return (
     <GalleryContainer>
@@ -22,9 +43,9 @@ const Gallery = ({ photos, email, onUploadSuccess }) => {
       </Header>
       <PhotoGrid>
         {photos && photos.length > 0 ? (
-          photos.map((photo, index) => (
-            <PhotoItem key={index} onClick={() => openModal(`${SERVER_URL}/uploads/${photo.filename}`)}>
-              <img src={`${SERVER_URL}/uploads/${photo.filename}`} alt={`gallery-${index}`} />
+          photos.map((photo, idx) => (
+            <PhotoItem key={idx} onClick={() => openModal(photo)}>
+              <img src={`${SERVER_URL}/uploads/${photo.filename}`} alt={`gallery-${idx}`} />
             </PhotoItem>
           ))
         ) : (
@@ -37,6 +58,9 @@ const Gallery = ({ photos, email, onUploadSuccess }) => {
           <ModalContent onClick={e => e.stopPropagation()}>
             <CloseBtn onClick={closeModal}>✕</CloseBtn>
             <ModalImage src={modalImg} alt="Full View" />
+            <TrashBtn onClick={handleDelete} title="Delete photo">
+              <FontAwesomeIcon icon={faTrash} />
+            </TrashBtn>
           </ModalContent>
         </ModalOverlay>
       )}
@@ -120,8 +144,18 @@ const CloseBtn = styled.button`
   right: 12px;
   background: none;
   border: none;
-  fontSize: 1.5rem;
+  font-size: 1.5rem;
   color: #444;
-  
+  cursor: pointer;
+`;
+
+const TrashBtn = styled.button`
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: red;
   cursor: pointer;
 `;
