@@ -101,7 +101,6 @@ const createProfileIcon = (photoUrl) => {
       overflow: hidden;">
       ${photoUrl ? `<img src="${photoUrl}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />` : ''}
     </div>`;
-
   return L.divIcon({
     html: iconHtml,
     className: 'custom-profile-icon',

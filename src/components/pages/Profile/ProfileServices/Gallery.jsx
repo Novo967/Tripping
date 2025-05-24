@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import UploadForm from '../ProfileServices/UploadForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+//import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -59,7 +59,7 @@ const Gallery = ({ photos, email, onUploadSuccess, onDeletePhoto }) => {
             <CloseBtn onClick={closeModal}>✕</CloseBtn>
             <ModalImage src={modalImg} alt="Full View" />
             <TrashBtn onClick={handleDelete} title="Delete photo">
-              <FontAwesomeIcon icon={faTrash} />
+             
             </TrashBtn>
           </ModalContent>
         </ModalOverlay>
