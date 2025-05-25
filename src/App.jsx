@@ -12,6 +12,7 @@ import LogingIn from './/components/pages/UserSign/LogingIn';
 import OurStory from './components/pages/AboutUs/OurStory';
 import Careers from './components/pages/AboutUs/Carrers';
 import Contact from './components/pages/AboutUs/Contact';
+import ChatList from './components/pages/Chat/ChatList';
 import 'leaflet/dist/leaflet.css';
 import { UserProvider } from './components/pages/UserSign/UserContext';
 
@@ -56,6 +57,7 @@ function App() {
           <Route path="/OurStory" element={<OurStory />} />
           <Route path="/Careers" element={<Careers />} />
           <Route path="/Contact" element={<Contact />} />
+          <Route path="/chats" element={<ChatList />} />
         </Routes>
         <Footer />
       </Router>

@@ -1,33 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import {Button} from './Button';
-import { Link, useNavigate } from 'react-router-dom'; // עדכון הייבוא
+import React, { useState, useEffect, useContext } from 'react';
+import { Button } from './Button';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useContext } from 'react';
 import { UserContext } from '../pages/UserSign/UserContext';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 const NavbarContainer = styled.nav`
   background: #293A40;
   height: 80px;
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* לוגו משמאל, כל השאר מימין */
   align-items: center;
   font-size: 1.2rem;
   position: fixed;
   top: 0;
   z-index: 999;
+  padding: 0 20px;
   backdrop-filter: blur(8px);
-`;
-
-const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 80px;
-  width: 100%;
-  max-width: 1400px;
-  padding: 0 24px;
 `;
 
 const Logo = styled(Link)`
@@ -40,6 +31,22 @@ const Logo = styled(Link)`
   i {
     margin-left: 8px;
     color: #feb47b;
+  }
+`;
+
+const RightContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 15px; /* ריווח קטן בין הכפתורים */
+`;
+
+const WelcomeMessage = styled.span`
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 400;
+
+  @media screen and (max-width: 690px) {
+    display: none;
   }
 `;
 
@@ -56,16 +63,17 @@ const MenuIcon = styled.div`
 
 const NavMenu = styled.ul`
   display: flex;
-  align-items: center;
   list-style: none;
+  margin: 0;
+  padding: 0;
 
   @media screen and (max-width: 960px) {
-    flex-direction: column;
-    width: 100%;
-    height: 90vh;
     position: absolute;
     top: 80px;
     right: ${({ active }) => (active ? '0' : '-100%')};
+    width: 100%;
+    height: 90vh;
+    flex-direction: column;
     background: #121212;
     transition: all 0.5s ease;
     z-index: 1;
@@ -97,7 +105,7 @@ const NavLink = styled(Link)`
     justify-content: center;
 
     &:hover {
-      background:rgb(181, 149, 149);
+      background: rgb(181, 149, 149);
       color: #fff;
     }
   }
@@ -108,7 +116,7 @@ const MobileLink = styled(Link)`
 
   @media screen and (max-width: 960px) {
     display: block;
-    margin: 20px auto;
+    margin: 2px auto;
     font-size: 1.4rem;
     color: #fff;
     border: 1px solid #fff;
@@ -124,31 +132,31 @@ const MobileLink = styled(Link)`
   }
 `;
 
-const WelcomeMessage = styled.span`
-  margin-left: 20px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 400;
+const ChatIcon = styled.div`
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
 
-  @media screen and (max-width: 690px) {
-    display: none;
+  &:hover {
+    color: #feb47b;
   }
 `;
 
 function Navbar() {
   const [click, setClick] = useState(false);
-  const [button, setButton] = useState(true); // הגדרת מצב button
-  const navigate = useNavigate(); // השתמש ב useNavigate
+  const [button, setButton] = useState(true);
+  const navigate = useNavigate();
   const { username, logout } = useContext(UserContext);
+
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
 
   const showButton = () => {
-    setButton(window.innerWidth > 960);  // עדכון מצב button על פי רוחב המסך
+    setButton(window.innerWidth > 960);
   };
 
   useEffect(() => {
-   showButton();
+    showButton();
     window.addEventListener('resize', showButton);
     return () => window.removeEventListener('resize', showButton);
   }, []);
@@ -158,9 +166,7 @@ function Navbar() {
       const email = localStorage.getItem('userEmail');
       await fetch(`${SERVER_URL}/signout`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
       localStorage.removeItem('userEmail');
@@ -170,19 +176,19 @@ function Navbar() {
       console.error('Sign out failed:', error);
     }
   };
+
   return (
     <NavbarContainer>
-      <Container>
-        <Logo to='/' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          Tripping <i className='fa-solid fa-location-dot' />
-        </Logo>
+      <Logo to='/' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        Tripping <i className='fa-solid fa-location-dot' />
+      </Logo>
 
+      <RightContainer>
         {username && <WelcomeMessage>Welcome, {username}!</WelcomeMessage>}
 
         <MenuIcon onClick={handleClick}>
           <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
         </MenuIcon>
-
         <NavMenu active={click}>
           <NavItem>
             <NavLink to='/' onClick={closeMobileMenu}>Home</NavLink>
@@ -198,17 +204,24 @@ function Navbar() {
               <NavLink to='#' onClick={handleSignOut}>Sign Out</NavLink>
             </NavItem>
           ) : (
-            <NavItem>
-              <MobileLink to='/sign-up' onClick={closeMobileMenu}>Sign Up</MobileLink>
-            </NavItem>
+            /* כאן אם במצב מובייל (button == false) מציגים קישור רגיל בתפריט */
+            !button && (
+              <NavItem>
+                <NavLink to='/sign-up' onClick={closeMobileMenu}>Sign Up</NavLink>
+              </NavItem>
+            )
           )}
         </NavMenu>
 
+        {/* הכפתור הגדול יופיע רק במסך גדול (button == true) ואין משתמש */}
         {button && !username && (
           <Button to='/login' buttonStyle='btn--outline'>SIGN UP</Button>
         )}
-        
-      </Container>
+
+        <ChatIcon onClick={() => navigate('/chats')} title='Chats'>
+          <i className='fas fa-paper-plane' />
+        </ChatIcon>
+      </RightContainer>
     </NavbarContainer>
   );
 }

@@ -468,6 +468,33 @@ def post_message(chat_id):
         'text': msg.text,
         'timestamp': msg.timestamp.isoformat()
     }), 201
+@app.route('/user_chats')
+def get_user_chats():
+    email = request.args.get('userEmail')  # תואם ל-React
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    chats = Chat.query.filter(
+        (Chat.user1_id == user.id) | (Chat.user2_id == user.id)
+    ).all()
+
+    chat_list = []
+    for chat in chats:
+        other_user_id = chat.user2_id if chat.user1_id == user.id else chat.user1_id
+        other = User.query.get(other_user_id)
+
+        chat_list.append({
+            'chatId': chat.id,
+            'last_message': chat.last_message if hasattr(chat, 'last_message') else '',  # אם יש שדה כזה
+            'otherId': other.id,
+            'otherEmail': other.email,
+            'otherUsername': other.name,
+            'otherProfilePic': other.profile_pic
+        })
+
+    return jsonify(chat_list), 200
+
 
 # Run the app
 if __name__ == '__main__':
