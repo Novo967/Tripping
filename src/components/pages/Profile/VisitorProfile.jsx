@@ -121,8 +121,12 @@ export default function VisitorProfile() {
           )}
         </div>
       </div>
+      
+      console.log('userEmail:', localStorage.getItem('userEmail'));
+      console.log('otherEmail:', userData.email);
 
       <ChatModal
+      
         isOpen={chatOpen}
         onClose={() => setChatOpen(false)}
         userEmail={localStorage.getItem('userEmail')}
