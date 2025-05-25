@@ -150,7 +150,7 @@ const MapContainer = () => {
       navigator.geolocation.getCurrentPosition(
         ({ coords: { latitude, longitude } }) => {
           setUserLocation({ latitude, longitude });
-          const email = userEmail;
+          const email = localStorage.getItem('userEmail');
           if (email) {
             axios.post(`${SERVER_URL}/api/update_location`, { email, latitude, longitude }, { withCredentials: true });
           } else setIsLoggedIn(false);
