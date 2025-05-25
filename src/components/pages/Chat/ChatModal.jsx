@@ -26,6 +26,9 @@ function createChatId(email1, email2) {
 }
 
 export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
+  console.log('📨 ChatModal mounted');
+  console.log('userEmail:', userEmail);
+  console.log('otherEmail:', otherEmail);
   const [chatId, setChatId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newText, setNewText] = useState('');
@@ -35,6 +38,7 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
   useEffect(() => {
     if (userEmail && otherEmail) {
       const id = createChatId(userEmail, otherEmail);
+      console.log('Computed chatId:', chatId);
       setChatId(id);
     }
   }, [userEmail, otherEmail]);
