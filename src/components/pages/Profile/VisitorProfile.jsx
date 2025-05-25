@@ -25,13 +25,13 @@ export default function VisitorProfile() {
   const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(
-      `${SERVER_URL}/visitor_profile`,
-      { params: { email } }
-    )
-    .then(res => setUserData(res.data))
+  axios.get(`${SERVER_URL}/visitor_profile`, { params: { email } })
+    .then(res => {
+      console.log("📦 Full response from server:", res.data);
+      setUserData(res.data);
+    })
     .catch(console.error);
-  }, [email]);
+}, [email]);
 
   if (!userData) {
     return (
