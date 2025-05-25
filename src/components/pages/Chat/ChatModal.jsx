@@ -69,20 +69,30 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
 
   // שליחת הודעה חדשה ל-Firestore
   const sendMessage = async () => {
-     console.log('sendMessage called'); 
-    if (!newText.trim() || !chatId) return;
-    try {
-      const messagesRef = collection(db, 'chats', chatId, 'messages');
-      await addDoc(messagesRef, {
-        sender_email: userEmail,
-        text: newText.trim(),
-        timestamp: serverTimestamp(),
-      });
-      setNewText('');
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  };
+  console.log('sendMessage called');
+  if (!newText.trim()) {
+    console.log('Message is empty, ignoring send');
+    return;
+  }
+
+  if (!chatId) {
+    console.error('No chatId set, cannot send message');
+    return;
+  }
+
+  try {
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    await addDoc(messagesRef, {
+      text: newText.trim(),
+      sender_email: userEmail,
+      timestamp: serverTimestamp(),
+    });
+    console.log('Message sent:', newText.trim());
+    setNewText('');
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+};
 
   const handleKeyDown = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
