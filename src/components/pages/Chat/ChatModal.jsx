@@ -69,6 +69,7 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
 
   // שליחת הודעה חדשה ל-Firestore
   const sendMessage = async () => {
+     console.log('sendMessage called'); 
     if (!newText.trim() || !chatId) return;
     try {
       const messagesRef = collection(db, 'chats', chatId, 'messages');
