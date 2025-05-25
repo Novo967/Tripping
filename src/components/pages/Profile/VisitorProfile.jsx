@@ -123,7 +123,6 @@ export default function VisitorProfile() {
       </div>
 
       <ChatModal
-      
         isOpen={chatOpen}
         onClose={() => setChatOpen(false)}
         userEmail={localStorage.getItem('userEmail')}

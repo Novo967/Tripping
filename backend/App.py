@@ -293,7 +293,8 @@ def visitor_profile():
         'id': user.id,
         'username': user.name,
         'profile_pic': user.profile_pic,
-        'gallery': [photo.filename for photo in photos]
+        'gallery': [photo.filename for photo in photos],
+        'email': user.email
     }), 200
 # קבלת כל הסיכות
 @app.route('/api/pins', methods=['GET'])
