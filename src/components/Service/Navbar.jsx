@@ -44,7 +44,7 @@ const WelcomeMessage = styled.span`
   color: #fff;
   font-size: 1rem;
   font-weight: 400;
-
+  padding:10px;
   @media screen and (max-width: 690px) {
     display: none;
   }
@@ -181,10 +181,11 @@ function Navbar() {
     <NavbarContainer>
       <Logo to='/' onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
         Tripping <i className='fa-solid fa-location-dot' />
+        {username && <WelcomeMessage> Welcome, {username}!</WelcomeMessage>}
       </Logo>
-
+      
       <RightContainer>
-        {username && <WelcomeMessage>Welcome, {username}!</WelcomeMessage>}
+        
 
         <MenuIcon onClick={handleClick}>
           <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
