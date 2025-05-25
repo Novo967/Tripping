@@ -124,7 +124,7 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
             placeholder="Type a message..."
             rows={2}
           />
-          <Send onClick={sendMessage} disabled={!newText.trim()}>Send</Send>
+          <Send onClick={sendMessage} /*disabled={!newText.trim()}*/>Send</Send>
         </InputRow>
       </Modal>
     </Overlay>
