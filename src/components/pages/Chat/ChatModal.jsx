@@ -4,7 +4,8 @@ import {
   getFirestore, collection, query, orderBy,
   onSnapshot, addDoc, serverTimestamp
 } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
+
 
 // --- Firebase config and init ---
 // TODO: הכנס כאן את ה־firebaseConfig שלך (מקונסול Firebase)
@@ -17,9 +18,8 @@ const firebaseConfig = {
   appId: "1:688894548206:web:9d2599c7924807b66ebbff"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 // --- פונקציה ליצירת chatId ייחודי וממוין לפי שני המיילים ---
 function createChatId(email1, email2) {
   return [email1, email2].sort().join('_');
@@ -68,17 +68,24 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
   }, [messages]);
 
   // שליחת הודעה חדשה ל-Firestore
-  const sendMessage = async () => {
-  console.log('sendMessage called');
+ const sendMessage = async () => {
+  console.log('🔹 sendMessage called');
+
   if (!newText.trim()) {
-    console.log('Message is empty, ignoring send');
+    console.log('⚠️ Message is empty, ignoring send');
     return;
   }
 
   if (!chatId) {
-    console.error('No chatId set, cannot send message');
+    console.error('❌ No chatId set, cannot send message');
     return;
   }
+
+  console.log('📨 Attempting to send message...');
+  console.log('➡️ chatId:', chatId);
+  console.log('📝 message text:', newText.trim());
+  console.log('👤 sender_email:', userEmail);
+  console.log('🛣️ Writing to path:', `chats/${chatId}/messages`);
 
   try {
     const messagesRef = collection(db, 'chats', chatId, 'messages');
@@ -87,12 +94,14 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
       sender_email: userEmail,
       timestamp: serverTimestamp(),
     });
-    console.log('Message sent:', newText.trim());
+
+    console.log('✅ Message sent successfully!');
     setNewText('');
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('🔥 Error sending message:', error);
   }
 };
+
 
   const handleKeyDown = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
