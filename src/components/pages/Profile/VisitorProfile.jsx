@@ -126,6 +126,7 @@ export default function VisitorProfile() {
         isOpen={chatOpen}
         onClose={() => setChatOpen(false)}
         userEmail={localStorage.getItem('userEmail')}
+        otherEmail={userData.email}
         otherId={userData.id}
       />
     </>
