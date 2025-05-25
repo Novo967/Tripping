@@ -1,64 +1,93 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
+import {
+  getFirestore, collection, query, orderBy,
+  onSnapshot, addDoc, serverTimestamp
+} from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+// --- Firebase config and init ---
+// TODO: הכנס כאן את ה־firebaseConfig שלך (מקונסול Firebase)
+const firebaseConfig = {
+  apiKey: "AIzaSyB3WJO0D6ie6dOl2Ska4v9NhhCiVQip4WU",
+  authDomain: "trippingchat.firebaseapp.com",
+  projectId: "trippingchat",
+  storageBucket: "trippingchat.firebasestorage.app",
+  messagingSenderId: "688894548206",
+  appId: "1:688894548206:web:9d2599c7924807b66ebbff"
+};
 
-export default function ChatModal({ isOpen, onClose, userEmail, otherId }) {
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// --- פונקציה ליצירת chatId ייחודי וממוין לפי שני המיילים ---
+function createChatId(email1, email2) {
+  return [email1, email2].sort().join('_');
+}
+
+export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
   const [chatId, setChatId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newText, setNewText] = useState('');
-  const [otherUser, setOtherUser] = useState(null);
-  const [isTyping, setIsTyping] = useState(false);
   const bottomRef = useRef();
-  const typingTimeout = useRef(null);
 
-  const fetchMessages = () => {
-    axios.get(`${SERVER_URL}/api/chats/with/${otherId}`, {
-      params: { email: userEmail }
-    })
-    .then(res => {
-      setChatId(res.data.chat_id);
-      setMessages(res.data.messages);
-      setOtherUser(res.data.other_user); // expects {name, image}
-    })
-    .catch(console.error);
-  };
-
+  // צור את chatId ממיילים ממויים
   useEffect(() => {
-    if (isOpen) fetchMessages();
-  }, [isOpen]);
+    if (userEmail && otherEmail) {
+      const id = createChatId(userEmail, otherEmail);
+      setChatId(id);
+    }
+  }, [userEmail, otherEmail]);
+
+  // האזנה ל-Firestore להודעות בזמן אמת
+  useEffect(() => {
+    if (!chatId) return;
+
+    console.log('Starting Firestore listener for chatId:', chatId);
+
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+    const unsubscribe = onSnapshot(q, snapshot => {
+      const msgs = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setMessages(msgs);
+      console.log('Messages updated:', msgs);
+    });
+
+    return () => {
+      console.log('Unsubscribing listener for chatId:', chatId);
+      unsubscribe();
+    };
+  }, [chatId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = () => {
+  // שליחת הודעה חדשה ל-Firestore
+  const sendMessage = async () => {
     if (!newText.trim() || !chatId) return;
-    axios.post(`${SERVER_URL}/api/chats/${chatId}/messages`, {
-      email: userEmail,
-      text: newText
-    })
-    .then(() => {
+    try {
+      const messagesRef = collection(db, 'chats', chatId, 'messages');
+      await addDoc(messagesRef, {
+        sender_email: userEmail,
+        text: newText.trim(),
+        timestamp: serverTimestamp(),
+      });
       setNewText('');
-      setIsTyping(false);
-      fetchMessages();
-    })
-    .catch(console.error);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
-  };
-
-  const handleTyping = (e) => {
-    setNewText(e.target.value);
-    setIsTyping(true);
-    if (typingTimeout.current) clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => setIsTyping(false), 2000);
   };
 
   if (!isOpen) return null;
@@ -67,13 +96,7 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherId }) {
     <Overlay onClick={onClose}>
       <Modal onClick={e => e.stopPropagation()}>
         <Header>
-          <Profile>
-            {otherUser?.image && <Avatar src={otherUser.image} alt="avatar" />}
-            <NameContainer>
-              <Name>{otherUser?.name || 'User'}</Name>
-              {isTyping && <Typing>{otherUser?.name || 'User'} is typing...</Typing>}
-            </NameContainer>
-          </Profile>
+          <Name>{otherEmail}</Name>
           <Close onClick={onClose}>✕</Close>
         </Header>
         <Messages>
@@ -83,7 +106,9 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherId }) {
               <MsgBubble key={msg.id} isMine={isMine}>
                 {msg.text}
                 <Timestamp isMine={isMine}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {msg.timestamp?.seconds
+                    ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : ''}
                 </Timestamp>
               </MsgBubble>
             );
@@ -93,17 +118,20 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherId }) {
         <InputRow>
           <Input
             value={newText}
-            onChange={handleTyping}
+            onChange={e => setNewText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={2}
           />
-          <Send onClick={sendMessage}>Send</Send>
+          <Send onClick={sendMessage} disabled={!newText.trim()}>Send</Send>
         </InputRow>
       </Modal>
     </Overlay>
   );
 }
+
+// שאר styled-components נשארים כפי שהיו אצלך
+// (Overlay, Modal, Header, Name, Close, Messages, MsgBubble, Timestamp, InputRow, Input, Send)
 
 // styled-components
 const Overlay = styled.div`
