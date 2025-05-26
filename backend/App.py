@@ -353,7 +353,8 @@ def add_pin():
         lng     = lng,
         message = message,
         type    = pin_type,
-        date    = pin_date
+        date    = pin_date,
+        email=user.email
     )
     db.session.add(new_pin)
     db.session.commit()
