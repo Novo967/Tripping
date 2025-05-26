@@ -1,54 +1,61 @@
 import React, { useEffect, useState } from 'react';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '@/firebase'; // או הנתיב הנכון
+import axios from 'axios';
 import styled from 'styled-components';
 import ChatModal from '../Chat/ChatModal';
-import { db } from '../../../firebase'; // וודא שזה הנתיב לקובץ firebase.js שלך
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc
-} from 'firebase/firestore';
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 export default function ChatList() {
   const [chats, setChats] = useState([]);
+  const [usersMap, setUsersMap] = useState({}); // מפה של אימייל -> { username, profilePic }
   const [selectedChat, setSelectedChat] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const currentUserId = localStorage.getItem('userId');
+  const userEmail = localStorage.getItem('userEmail');
 
+  // טען צ'אטים של המשתמש מ-Firebase
   useEffect(() => {
-    if (!currentUserId) return;
+    if (!userEmail) return;
 
-    const fetchChats = async () => {
-      try {
-        const q = query(collection(db, 'chats'), where('userIds', 'array-contains', currentUserId));
-        const querySnapshot = await getDocs(q);
+    const q = query(
+      collection(db, 'chats'),
+      where('participants', 'array-contains', userEmail)
+    );
 
-        const chatData = await Promise.all(querySnapshot.docs.map(async (docSnap) => {
-          const chat = docSnap.data();
-          const otherUserId = chat.userIds.find(id => id !== currentUserId);
-          const otherUserDoc = await getDoc(doc(db, 'users', otherUserId));
-          const otherUser = otherUserDoc.exists() ? otherUserDoc.data() : {};
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const chatsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setChats(chatsData);
 
-          return {
-            chatId: docSnap.id,
-            otherId: otherUserId,
-            otherUsername: otherUser.username || 'Unknown',
-            otherEmail: otherUser.email || '',
-            otherProfilePic: otherUser.profilePic || '', // URL מלא לתמונה
-          };
-        }));
+      // אסוף כל האימיילים של המשתמשים האחרים בצ'אטים
+      const otherEmails = new Set();
+      chatsData.forEach(chat => {
+        chat.participants.forEach(email => {
+          if (email !== userEmail) otherEmails.add(email);
+        });
+      });
 
-        setChats(chatData);
-      } catch (error) {
-        console.error('Error fetching chats from Firestore:', error);
-      }
-    };
+      // טען פרטי משתמשים מהשרת Flask לפי האימיילים
+      Promise.all(
+        Array.from(otherEmails).map(email =>
+          axios.get(`${SERVER_URL}/user_profile`, { params: { email } })
+            .then(res => ({ email, data: res.data }))
+            .catch(() => null)
+        )
+      ).then(results => {
+        const map = {};
+        results.forEach(r => {
+          if (r) {
+            map[r.email] = r.data; // צריך לקבל { username, profilePic } מהשרת
+          }
+        });
+        setUsersMap(map);
+      });
+    });
 
-    fetchChats();
-  }, [currentUserId]);
+    return () => unsubscribe();
+  }, [userEmail]);
 
   const handleOpenChat = (chat) => {
     setSelectedChat(chat);
@@ -57,21 +64,30 @@ export default function ChatList() {
 
   return (
     <Wrapper>
-      <h2>השיחות שלי</h2>
-      {chats.map(chat => (
-        <ChatBanner key={chat.chatId} onClick={() => handleOpenChat(chat)}>
-          <img src={chat.otherProfilePic} alt="Profile" />
-          <span>{chat.otherUsername}</span>
-        </ChatBanner>
-      ))}
+      <h2>My Chats</h2>
+      {chats.map(chat => {
+        // מי המשתמש השני בצ'אט?
+        const otherEmail = chat.participants.find(email => email !== userEmail);
+        const userInfo = usersMap[otherEmail] || {};
+        const profilePicUrl = userInfo.profilePic
+          ? `${SERVER_URL}/uploads/${userInfo.profilePic}`
+          : '/default-profile.png'; // תמונת ברירת מחדל
+
+        return (
+          <ChatBanner key={chat.id} onClick={() => handleOpenChat(chat)}>
+            <img src={profilePicUrl} alt="Profile" />
+            <span>{userInfo.username || otherEmail}</span>
+          </ChatBanner>
+        );
+      })}
 
       {selectedChat && (
         <ChatModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
-          userId={currentUserId}
-          otherId={selectedChat.otherId}
-          otherEmail={selectedChat.otherEmail}
+          userEmail={userEmail}
+          otherEmail={selectedChat.participants.find(email => email !== userEmail)}
+          chatId={selectedChat.id}
         />
       )}
     </Wrapper>
