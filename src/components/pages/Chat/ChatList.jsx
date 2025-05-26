@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ChatModal from '../Chat/ChatModal';
 import styled from 'styled-components';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 
 import {
   getFirestore, collection, query, where, onSnapshot, getDoc, doc
@@ -77,7 +79,14 @@ export default function ChatList() {
       {chats.map(chat => (
         <ChatBanner key={chat.chatId} onClick={() => handleOpenChat(chat)}>
           {chat.otherProfilePic ? (
-            <img src={chat.otherProfilePic} alt="Profile" />
+           <img
+            src={
+                chat.otherProfilePic?.startsWith('http')
+                ? chat.otherProfilePic
+                : `${SERVER_URL}/uploads/${chat.otherProfilePic}`
+            }
+            alt="Profile"
+            />
           ) : (
             <PlaceholderPic />
           )}
