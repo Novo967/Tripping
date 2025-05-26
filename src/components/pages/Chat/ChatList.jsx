@@ -1,25 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ChatModal from '../Chat/ChatModal';
 import styled from 'styled-components';
-
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+import ChatModal from '../Chat/ChatModal';
+import { db } from '../../firebase'; // וודא שזה הנתיב לקובץ firebase.js שלך
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc
+} from 'firebase/firestore';
 
 export default function ChatList() {
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const userEmail = localStorage.getItem('userEmail');
+
+  const currentUserId = localStorage.getItem('userId');
 
   useEffect(() => {
-    if (!userEmail) return;
+    if (!currentUserId) return;
 
-    axios.get(`${SERVER_URL}/user_chats`, { params: { userEmail } })
-      .then(res => {
-        setChats(res.data);
-      })
-      .catch(console.error);
-  }, [userEmail]);
+    const fetchChats = async () => {
+      try {
+        const q = query(collection(db, 'chats'), where('userIds', 'array-contains', currentUserId));
+        const querySnapshot = await getDocs(q);
+
+        const chatData = await Promise.all(querySnapshot.docs.map(async (docSnap) => {
+          const chat = docSnap.data();
+          const otherUserId = chat.userIds.find(id => id !== currentUserId);
+          const otherUserDoc = await getDoc(doc(db, 'users', otherUserId));
+          const otherUser = otherUserDoc.exists() ? otherUserDoc.data() : {};
+
+          return {
+            chatId: docSnap.id,
+            otherId: otherUserId,
+            otherUsername: otherUser.username || 'Unknown',
+            otherEmail: otherUser.email || '',
+            otherProfilePic: otherUser.profilePic || '', // URL מלא לתמונה
+          };
+        }));
+
+        setChats(chatData);
+      } catch (error) {
+        console.error('Error fetching chats from Firestore:', error);
+      }
+    };
+
+    fetchChats();
+  }, [currentUserId]);
 
   const handleOpenChat = (chat) => {
     setSelectedChat(chat);
@@ -31,7 +60,7 @@ export default function ChatList() {
       <h2>השיחות שלי</h2>
       {chats.map(chat => (
         <ChatBanner key={chat.chatId} onClick={() => handleOpenChat(chat)}>
-          <img src={`${SERVER_URL}/uploads/${chat.otherProfilePic}`} alt="Profile" />
+          <img src={chat.otherProfilePic} alt="Profile" />
           <span>{chat.otherUsername}</span>
         </ChatBanner>
       ))}
@@ -40,9 +69,9 @@ export default function ChatList() {
         <ChatModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
-          userEmail={userEmail}
-          otherEmail={selectedChat.otherEmail}
+          userId={currentUserId}
           otherId={selectedChat.otherId}
+          otherEmail={selectedChat.otherEmail}
         />
       )}
     </Wrapper>
