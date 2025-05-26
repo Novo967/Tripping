@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import ChatModal from '../Chat/ChatModal';
 import styled from 'styled-components';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+import {
+  getFirestore, collection, query, where, onSnapshot, getDoc, doc
+} from 'firebase/firestore';
+import { initializeApp, getApps } from 'firebase/app';
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyB3WJO0D6ie6dOl2Ska4v9NhhCiVQip4WU",
+  authDomain: "trippingchat.firebaseapp.com",
+  projectId: "trippingchat",
+  storageBucket: "trippingchat.firebasestorage.app",
+  messagingSenderId: "688894548206",
+  appId: "1:688894548206:web:9d2599c7924807b66ebbff"
+};
+
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export default function ChatList() {
   const [chats, setChats] = useState([]);
@@ -14,11 +29,41 @@ export default function ChatList() {
   useEffect(() => {
     if (!userEmail) return;
 
-    axios.get(`${SERVER_URL}/user_chats`, { params: { userEmail } })
-      .then(res => {
-        setChats(res.data);
-      })
-      .catch(console.error);
+    const q = query(collection(db, 'chats'), where('participants', 'array-contains', userEmail));
+
+    const unsubscribe = onSnapshot(q, async snapshot => {
+      const chatData = await Promise.all(snapshot.docs.map(async docSnap => {
+        const data = docSnap.data();
+        const otherEmail = data.participants.find(p => p !== userEmail);
+
+        // משיכת מידע נוסף על המשתמש השני
+        let otherUsername = otherEmail;
+        let otherProfilePic = '';
+
+        try {
+          const userDoc = await getDoc(doc(db, 'users', otherEmail));
+          if (userDoc.exists()) {
+            const userInfo = userDoc.data();
+            otherUsername = userInfo.username || otherEmail;
+            otherProfilePic = userInfo.profilePic || '';
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+        }
+
+        return {
+          chatId: docSnap.id,
+          lastMessage: data.lastMessage,
+          otherEmail,
+          otherUsername,
+          otherProfilePic,
+        };
+      }));
+
+      setChats(chatData);
+    });
+
+    return () => unsubscribe();
   }, [userEmail]);
 
   const handleOpenChat = (chat) => {
@@ -31,7 +76,11 @@ export default function ChatList() {
       <h2>My Chats</h2>
       {chats.map(chat => (
         <ChatBanner key={chat.chatId} onClick={() => handleOpenChat(chat)}>
-          <img src={`${SERVER_URL}/uploads/${chat.otherProfilePic}`} alt="Profile" />
+          {chat.otherProfilePic ? (
+            <img src={chat.otherProfilePic} alt="Profile" />
+          ) : (
+            <PlaceholderPic />
+          )}
           <span>{chat.otherUsername}</span>
         </ChatBanner>
       ))}
@@ -42,7 +91,6 @@ export default function ChatList() {
           onClose={() => setModalOpen(false)}
           userEmail={userEmail}
           otherEmail={selectedChat.otherEmail}
-          otherId={selectedChat.otherId}
         />
       )}
     </Wrapper>
@@ -81,4 +129,11 @@ const ChatBanner = styled.div`
   &:hover {
     background: #e0e0e0;
   }
+`;
+
+const PlaceholderPic = styled.div`
+  width: 50px;
+  height: 50px;
+  background: #ccc;
+  border-radius: 50%;
 `;
