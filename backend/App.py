@@ -35,7 +35,7 @@ class User(db.Model):
     photos = db.Column(db.PickleType, default=[])
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
-    profile_pic = db.Column(db.String(255))  # <-- ADD THIS
+    profile_pic = db.Column(db.String(255), default = 'profile_defult_img.webp')  # <-- ADD THIS
     is_online = db.Column(db.Boolean, default=False)
 class Pin(db.Model):
     id       = db.Column(db.Integer, primary_key=True)
@@ -226,14 +226,20 @@ def uploaded_file(filename):
 def upload_profile_pic():
     photo = request.files.get('photo')
     email = request.form.get('email')
-
-    if not photo or not email:
+    
+    if  not email:
         return jsonify({'error': 'Missing file or email'}), 400
 
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
-
+        
+    if not photo:
+        # Set default profile picture
+        user.profile_pic = 'profile_default_img.webp'
+        db.session.commit()
+        return jsonify({'message': 'Default profile picture set', 'filename': user.profile_pic}), 200
+     
     filename = secure_filename(photo.filename)
     filepath = os.path.join('uploads', filename)
     photo.save(filepath)

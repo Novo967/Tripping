@@ -61,7 +61,7 @@ function Profile() {
 
         <Header>
           <PictureWrapper>
-            <ProfilePic src={`${SERVER_URL}/uploads/${profile.profile_pic}`} alt="Profile" />
+            <ProfilePic src={`${SERVER_URL}/uploads/${profile.profile_pic||'profile_defult_img.webp'}`} alt="Profile" />
             <StyledUpload>
               <UploadProfilePic
                 onUploadSuccess={(newFilename) =>

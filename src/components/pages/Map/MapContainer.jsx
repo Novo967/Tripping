@@ -213,7 +213,7 @@ const MapContainer = () => {
 
             {/* מארקרי משתמשים אחרים */}
             {allUsers.map(u => (
-              <Marker key={u.id} position={[u.lat, u.lng]} icon={createProfileIcon(u.profile_image ? `${SERVER_URL}/uploads/${u.profile_image}` : null)}>
+              <Marker key={u.id} position={[u.lat, u.lng]} icon={createProfileIcon(u.profile_image ? `${SERVER_URL}/uploads/${u.profile_image}` : `${SERVER_URL}/uploads/profile_defult_img.webp`)}>
                 <Popup><span onClick={() => navigate(`/visitor/${encodeURIComponent(u.email)}`)} style={{cursor:'pointer'}}>{u.username}</span></Popup>
               </Marker>
             ))}
