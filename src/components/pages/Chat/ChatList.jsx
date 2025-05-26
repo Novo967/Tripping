@@ -80,13 +80,10 @@ export default function ChatList() {
         <ChatBanner key={chat.chatId} onClick={() => handleOpenChat(chat)}>
           {chat.otherProfilePic ? (
            <img
-            src={
-                chat.otherProfilePic?.startsWith('http')
-                ? chat.otherProfilePic
-                : `${SERVER_URL}/uploads/${chat.otherProfilePic}`
-            }
+            src={`${SERVER_URL}/uploads/${chat.otherProfilePic}`}
             alt="Profile"
             />
+
           ) : (
             <PlaceholderPic />
           )}
