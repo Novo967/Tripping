@@ -2,13 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import {
   getFirestore, collection, query, orderBy,
-  onSnapshot, addDoc, serverTimestamp
+  onSnapshot, addDoc, serverTimestamp,
+  doc, getDoc, setDoc
 } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 
-
-// --- Firebase config and init ---
-// TODO: הכנס כאן את ה־firebaseConfig שלך (מקונסול Firebase)
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyB3WJO0D6ie6dOl2Ska4v9NhhCiVQip4WU",
   authDomain: "trippingchat.firebaseapp.com",
@@ -20,34 +19,26 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
-// --- פונקציה ליצירת chatId ייחודי וממוין לפי שני המיילים ---
+
 function createChatId(email1, email2) {
   return [email1, email2].sort().join('_');
 }
 
 export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
-  console.log('📨 ChatModal mounted');
-  console.log('userEmail:', userEmail);
-  console.log('otherEmail:', otherEmail);
   const [chatId, setChatId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newText, setNewText] = useState('');
   const bottomRef = useRef();
 
-  // צור את chatId ממיילים ממויים
   useEffect(() => {
     if (userEmail && otherEmail) {
       const id = createChatId(userEmail, otherEmail);
-      console.log('Computed chatId:', chatId);
       setChatId(id);
     }
   }, [userEmail, otherEmail]);
 
-  // האזנה ל-Firestore להודעות בזמן אמת
   useEffect(() => {
     if (!chatId) return;
-
-    console.log('Starting Firestore listener for chatId:', chatId);
 
     const messagesRef = collection(db, 'chats', chatId, 'messages');
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
@@ -58,54 +49,49 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
         ...doc.data()
       }));
       setMessages(msgs);
-      console.log('Messages updated:', msgs);
     });
 
-    return () => {
-      console.log('Unsubscribing listener for chatId:', chatId);
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [chatId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // שליחת הודעה חדשה ל-Firestore
- const sendMessage = async () => {
-  console.log('🔹 sendMessage called');
+  const sendMessage = async () => {
+    if (!newText.trim() || !chatId) return;
 
-  if (!newText.trim()) {
-    console.log('⚠️ Message is empty, ignoring send');
-    return;
-  }
+    try {
+      const chatDocRef = doc(db, 'chats', chatId);
+      const chatDoc = await getDoc(chatDocRef);
 
-  if (!chatId) {
-    console.error('❌ No chatId set, cannot send message');
-    return;
-  }
+      if (!chatDoc.exists()) {
+        await setDoc(chatDocRef, {
+          participants: [userEmail, otherEmail],
+          createdAt: serverTimestamp(),
+          lastMessage: newText.trim(),
+          lastSender: userEmail,
+        });
+      } else {
+        await setDoc(chatDocRef, {
+          lastMessage: newText.trim(),
+          lastSender: userEmail,
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+      }
 
-  console.log('📨 Attempting to send message...');
-  console.log('➡️ chatId:', chatId);
-  console.log('📝 message text:', newText.trim());
-  console.log('👤 sender_email:', userEmail);
-  console.log('🛣️ Writing to path:', `chats/${chatId}/messages`);
+      const messagesRef = collection(db, 'chats', chatId, 'messages');
+      await addDoc(messagesRef, {
+        text: newText.trim(),
+        sender_email: userEmail,
+        timestamp: serverTimestamp(),
+      });
 
-  try {
-    const messagesRef = collection(db, 'chats', chatId, 'messages');
-    await addDoc(messagesRef, {
-      text: newText.trim(),
-      sender_email: userEmail,
-      timestamp: serverTimestamp(),
-    });
-
-    console.log('✅ Message sent successfully!');
-    setNewText('');
-  } catch (error) {
-    console.error('🔥 Error sending message:', error);
-  }
-};
-
+      setNewText('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
 
   const handleKeyDown = e => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -147,17 +133,14 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
             placeholder="Type a message..."
             rows={2}
           />
-          <Send onClick={sendMessage} /*disabled={!newText.trim()}*/>Send</Send>
+          <Send onClick={sendMessage}>Send</Send>
         </InputRow>
       </Modal>
     </Overlay>
   );
 }
 
-// שאר styled-components נשארים כפי שהיו אצלך
-// (Overlay, Modal, Header, Name, Close, Messages, MsgBubble, Timestamp, InputRow, Input, Send)
-
-// styled-components
+// Styled Components
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
@@ -167,10 +150,6 @@ const Overlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
-
-  @media (max-width: 768px) {
-    padding: 16px 12px;
-  }
 `;
 
 const Modal = styled.div`
@@ -183,17 +162,7 @@ const Modal = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-sizing: border-box;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-    height: 80vh;
-    border-radius: 12px;
-    padding: 16px 20px;
-  }
 `;
-
 
 const Header = styled.div`
   display: flex;
@@ -201,36 +170,11 @@ const Header = styled.div`
   align-items: center;
   padding-bottom: 12px;
   border-bottom: 1px solid #f0f0f0;
-  background: transparent;
-`;
-
-const Profile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const Avatar = styled.img`
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-const NameContainer = styled.div`
-  display: flex;
-  flex-direction: column;
 `;
 
 const Name = styled.div`
   font-weight: bold;
   font-size: 1rem;
-  color: #000;
-`;
-
-const Typing = styled.div`
-  font-size: 0.8rem;
-  color: #666;
 `;
 
 const Close = styled.button`
@@ -239,12 +183,6 @@ const Close = styled.button`
   font-size: 1.6rem;
   cursor: pointer;
   color: #f39c12;
-  font-weight: bold;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #d87e04;
-  }
 `;
 
 const Messages = styled.div`
@@ -263,21 +201,17 @@ const Messages = styled.div`
 const MsgBubble = styled.div`
   align-self: ${props => (props.isMine ? 'flex-end' : 'flex-start')};
   background: ${props => (props.isMine ? '#a3d5ff' : '#e1e5f2')};
-  color: #222;
   padding: 12px 18px;
   margin: 6px 0;
   border-radius: 18px;
   border-bottom-${props => (props.isMine ? 'right' : 'left')}-radius: 6px;
   max-width: 75%;
   word-wrap: break-word;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   position: relative;
-  transition: all 0.3s ease;
 `;
 
 const Timestamp = styled.span`
   font-size: 0.7rem;
-  color: #555;
   position: absolute;
   bottom: -18px;
   right: ${props => (props.isMine ? '10px' : 'unset')};
@@ -286,8 +220,6 @@ const Timestamp = styled.span`
 
 const InputRow = styled.div`
   display: flex;
-  padding: 12px 0;
-  background: transparent;
   gap: 12px;
   align-items: center;
 `;
@@ -298,17 +230,7 @@ const Input = styled.textarea`
   border: 1.8px solid #d1d5db;
   border-radius: 10px;
   resize: none;
-  color: black;
   font-size: 1rem;
-  line-height: 1.5;
-  background: #fff;
-  transition: border-color 0.25s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
-  }
 `;
 
 const Send = styled.button`
@@ -319,15 +241,4 @@ const Send = styled.button`
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s ease;
-
-  &:hover {
-    background: #d87e04;
-  }
-
-  &:disabled {
-    background: #f0c674;
-    cursor: not-allowed;
-  }
 `;
