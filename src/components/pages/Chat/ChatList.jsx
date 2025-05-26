@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ChatModal from '../Chat/ChatModal';
-import { db } from '../../firebase'; // וודא שזה הנתיב לקובץ firebase.js שלך
+import { db } from '../../../firebase'; // וודא שזה הנתיב לקובץ firebase.js שלך
 import {
   collection,
   query,
