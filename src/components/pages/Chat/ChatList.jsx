@@ -78,7 +78,7 @@ export default function ChatList() {
             <img src={profilePicUrl} alt="Profile" />
             <span>{userInfo.username || otherEmail}</span>
           </ChatBanner>
-        );
+        )
       })}
 
       {selectedChat && (
