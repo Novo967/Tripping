@@ -32,7 +32,7 @@ const Message = styled.div`
   }
 
   h2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 0.5rem;
     color: #fff;
     z-index: 2;
@@ -40,7 +40,7 @@ const Message = styled.div`
 
   p {
     margin-bottom: 1.5rem;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #eee;
     z-index: 2;
   }
@@ -67,7 +67,7 @@ const BottomGradient = styled.div`
 
 const BottomLink = styled.div`
   margin-top: 1rem;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #ddd;
   z-index: 2;
 
@@ -84,13 +84,65 @@ const BottomLink = styled.div`
 `;
 
 const ServiceContainer = styled.div`
-  margin-top: 75px;
+  margin-top: 60px;
   padding: 10px;
   text-align: center;
 `;
 
+const AddPinButton = styled.button`
+  position: absolute;
+  top: 20px; /* מרווח גדול יותר מהחלק העליון */
+  right: 20px; /* גם מרווח מהצד */
+  z-index: 1000;
+  padding: 8px 12px;
+  background-color: #feb47b;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #ff8c42;
+  }
+
+  @media (max-width: 768px) {
+    top: 15px; /* מרווח גם במובייל */
+    right: 15px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    top: 10px; /* עוד יותר נמוך במסכים קטנים */
+    right: 10px;
+  }
+`;
+
+
+const MapContainerStyled = styled.div`
+  .leaflet-container {
+    height: 60vh;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .leaflet-container {
+      height: 50vh;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .leaflet-container {
+      height: 40vh;
+    }
+  }
+`;
+
 const createProfileIcon = (photoUrl) => {
-  const radius = 20;
+  const radius = 15;
   const iconHtml = `
     <div style="
       width: ${radius * 2}px; 
@@ -104,13 +156,12 @@ const createProfileIcon = (photoUrl) => {
   return L.divIcon({
     html: iconHtml,
     className: 'custom-profile-icon',
-    iconSize: [radius * 2, radius * 2 + 10],
+    iconSize: [radius * 2, radius * 2 + 8],
     iconAnchor: [radius, radius * 2],
-    popupAnchor: [0, -radius * 2 - 10]
+    popupAnchor: [0, -radius * 2 - 8]
   });
 };
 
-// מאזין ללחיצות במפה ומשגר את handleMapClick
 const MapClickHandler = ({ onClick }) => {
   useMapEvents({
     click(e) {
@@ -134,13 +185,21 @@ const MapContainer = () => {
   const userEmail = localStorage.getItem('userEmail');
 
   const fetchPins = async () => {
-    try { const res = await axios.get(`${SERVER_URL}/api/pins`); setPins(res.data); }
-    catch (err) { console.error('Error fetching pins:', err); }
+    try {
+      const res = await axios.get(`${SERVER_URL}/api/pins`);
+      setPins(res.data);
+    } catch (err) {
+      console.error('Error fetching pins:', err);
+    }
   };
 
   const fetchAllUsers = async () => {
-    try { const res = await axios.get(`${SERVER_URL}/api/locations`); setAllUsers(res.data); }
-    catch (err) { console.error('Error fetching users:', err); }
+    try {
+      const res = await axios.get(`${SERVER_URL}/api/locations`);
+      setAllUsers(res.data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
   };
 
   useEffect(() => {
@@ -162,7 +221,10 @@ const MapContainer = () => {
 
   const togglePinMode = () => {
     const count = pins.filter(p => p.email === userEmail).length;
-    if (!pinMode && count >= 3) { alert('לא ניתן לדקור יותר מ־3 סיכות'); return; }
+    if (!pinMode && count >= 3) {
+      alert('לא ניתן לדקור יותר מ־3 סיכות');
+      return;
+    }
     setPinMode(prev => !prev);
     if (pinMode) setFormVisible(false);
   };
@@ -175,7 +237,7 @@ const MapContainer = () => {
   };
 
   if (!userLocation) return <div>Loading your location...</div>;
-   if (!isLoggedIn) {
+  if (!isLoggedIn) {
     return (
       <Message>
         <video src="/videos/video-5.mp4" autoPlay loop muted />
@@ -193,38 +255,34 @@ const MapContainer = () => {
     );
   }
 
-
   return (
     <div className={`map-placeholder ${pinMode ? 'pin-mode' : ''}`}>  
       <ServiceContainer>
         <div style={{ position: 'relative' }}>
-          <button onClick={togglePinMode} style={{ position:'absolute', top:10, right:10, zIndex:1000, padding:'12px', backgroundColor: pinMode ? '#ff6b6b' : '#4caf50', color:'#fff', border:'none', borderRadius:'8px' }}>
-            {pinMode ? '❌' : '📍'}
-          </button>
+          <AddPinButton onClick={togglePinMode}>
+            {pinMode ? '❌ Cancel' : '📍 Add Event'}
+          </AddPinButton>
 
-          <LeafletMap center={[userLocation.latitude, userLocation.longitude]} zoom={13} style={{ height:'60vh', width:'100%' }}>
-            <MapClickHandler onClick={handleMapClick} />
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+          <MapContainerStyled>
+            <LeafletMap center={[userLocation.latitude, userLocation.longitude]} zoom={13}>
+              <MapClickHandler onClick={handleMapClick} />
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
 
-            {/* מארקר המשתמש */}
-            <Marker position={[userLocation.latitude, userLocation.longitude]} icon={createProfileIcon(userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null)}>
-              <Popup>You are here!</Popup>
-            </Marker>
-
-            {/* מארקרי משתמשים אחרים */}
-            {allUsers.map(u => (
-              <Marker key={u.id} position={[u.lat, u.lng]} icon={createProfileIcon(u.profile_image ? `${SERVER_URL}/uploads/${u.profile_image}` : `${SERVER_URL}/uploads/profile_defult_img.webp`)}>
-                <Popup><span onClick={() => navigate(`/visitor/${encodeURIComponent(u.email)}`)} style={{cursor:'pointer'}}>{u.username}</span></Popup>
+              <Marker position={[userLocation.latitude, userLocation.longitude]} icon={createProfileIcon(userProfilePic ? `${SERVER_URL}/uploads/${userProfilePic}` : null)}>
+                <Popup>You are here!</Popup>
               </Marker>
-            ))}
 
-            {/* מארקרי סיכות עם פרטים מורחבים ושם משתמש */}
-            {pins.map(pin => {
-              return (
+              {allUsers.map(u => (
+                <Marker key={u.id} position={[u.lat, u.lng]} icon={createProfileIcon(u.profile_image ? `${SERVER_URL}/uploads/${u.profile_image}` : `${SERVER_URL}/uploads/profile_defult_img.webp`)}>
+                  <Popup><span onClick={() => navigate(`/visitor/${encodeURIComponent(u.email)}`)} style={{cursor:'pointer'}}>{u.username}</span></Popup>
+                </Marker>
+              ))}
+
+              {pins.map(pin => (
                 <Marker key={pin.id} position={[pin.lat, pin.lng]}>
                   <Popup>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <strong> {pin.type}</strong>
+                      <strong>{pin.type}</strong>
                       <span>תאריך: {new Date(pin.date).toLocaleDateString('he-IL')}</span>
                       <p>{pin.message}</p>
                       <em
@@ -239,11 +297,10 @@ const MapContainer = () => {
                     </div>
                   </Popup>
                 </Marker>
-              );
-            })}
-          </LeafletMap>
+              ))}
+            </LeafletMap>
+          </MapContainerStyled>
 
-          {/* טופס לאחר בחירת מיקום */}
           <PinForm
             visible={formVisible && clickLocation}
             onCancel={() => setFormVisible(false)}
@@ -258,5 +315,3 @@ const MapContainer = () => {
 };
 
 export default MapContainer;
-
-

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db } from '@/firebase'; // או הנתיב הנכון
+import { db } from '../../../firebase'; // או הנתיב הנכון
 import axios from 'axios';
 import styled from 'styled-components';
 import ChatModal from '../Chat/ChatModal';

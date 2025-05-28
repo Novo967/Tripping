@@ -2,92 +2,83 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 // צבע כתום מאופיין של האתר
-const primaryColor = '#feb47b';  // אתה יכול להחליף כאן לגוון הכתום שלך
+const primaryColor = '#feb47b';  
+const hoverColor = '#ff8c42'; // כתום חזק יותר
+const errorColor = '#e63946'; // צבע אדום יפה
 
 // Overlay
 const Overlay = styled.div`
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(5px);
 `;
 
 // Form Container
 const FormContainer = styled.div`
   background: #fff;
-  padding: 32px 24px;
-  border-radius: 16px;
-  width: 340px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  width: 380px;
   max-width: 90%;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  transition: transform 0.3s;
+  
+  &:hover {
+    transform: translateY(-5px);
+  }
 `;
 
 // Field Styling
 const Field = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
 `;
 
 // Label
 const Label = styled.label`
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   color: #333;
 `;
 
-// Inputs and Textarea
-const Input = styled.input`
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+// Inputs, Select, Textarea
+const sharedStyles = `
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
   font-size: 14px;
-  transition: border-color 0.3s;
+  color: #000;  // הוספה של צבע טקסט שחור
+  background-color: #fafafa;
+  transition: border-color 0.3s, box-shadow 0.3s;
 
   &:focus {
     border-color: ${primaryColor};
+    box-shadow: 0 0 5px ${primaryColor};
     outline: none;
   }
 `;
 
-const Select = styled.select`
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  transition: border-color 0.3s;
 
-  &:focus {
-    border-color: ${primaryColor};
-    outline: none;
-  }
-`;
-
+const Input = styled.input`${sharedStyles}`;
+const Select = styled.select`${sharedStyles}`;
 const Textarea = styled.textarea`
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+  ${sharedStyles}
   resize: vertical;
-  transition: border-color 0.3s;
-
-  &:focus {
-    border-color: ${primaryColor};
-    outline: none;
-  }
 `;
 
 // Error Message
 const ErrorMessage = styled.div`
-  color: red;
-  margin-bottom: 12px;
+  color: ${errorColor};
+  margin-bottom: 16px;
   font-size: 13px;
   text-align: center;
 `;
@@ -95,27 +86,29 @@ const ErrorMessage = styled.div`
 // Button Group
 const ButtonGroup = styled.div`
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
 `;
 
 // Buttons
 const Button = styled.button`
-  padding: 10px 20px;
+  flex: 1;
+  padding: 12px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
   color: #fff;
 
   background-color: ${({ cancel }) => (cancel ? '#ccc' : primaryColor)};
 
   &:hover {
-    background-color: ${({ cancel }) => (cancel ? '#b3b3b3' : '#e65c28')};
+    background-color: ${({ cancel }) => (cancel ? '#b3b3b3' : hoverColor)};
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
 `;
 
