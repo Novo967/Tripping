@@ -24,12 +24,13 @@ function createChatId(email1, email2) {
   return [email1, email2].sort().join('_');
 }
 
-export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
+export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, otherUsername }) {
   const [chatId, setChatId] = useState(null);
+  
   const [messages, setMessages] = useState([]);
   const [newText, setNewText] = useState('');
   const bottomRef = useRef();
-
+    
   useEffect(() => {
     if (userEmail && otherEmail) {
       const id = createChatId(userEmail, otherEmail);
@@ -57,7 +58,8 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
+   
+    
   const sendMessage = async () => {
     if (!newText.trim() || !chatId) return;
 
@@ -79,7 +81,7 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
           updatedAt: serverTimestamp(),
         }, { merge: true });
       }
-
+      
       const messagesRef = collection(db, 'chats', chatId, 'messages');
       await addDoc(messagesRef, {
         text: newText.trim(),
@@ -106,7 +108,8 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail }) {
     <Overlay onClick={onClose}>
       <Modal onClick={e => e.stopPropagation()}>
         <Header>
-          <Name>{otherEmail}</Name>
+            
+          <Name>{otherUsername}</Name>
           <Close onClick={onClose}>✕</Close>
         </Header>
         <Messages>

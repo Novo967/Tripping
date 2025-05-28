@@ -85,6 +85,7 @@ export default function ChatList() {
             onClose={() => setModalOpen(false)}
             userEmail={userEmail}
             otherEmail={selectedChat.participants.find(email => email !== userEmail)}
+            otherUsername={usersMap[selectedChat.participants.find(email => email !== userEmail)]?.username}
             chatId={selectedChat.id}
           />
         )}
