@@ -255,6 +255,27 @@ const MapContainer = () => {
     );
   }
 
+  const createPinIcon = () => {
+  const radius = 10;
+  const iconHtml = `
+    <div style="
+      width: ${radius * 2}px; 
+      height: ${radius * 2}px; 
+      background-color: #feb47b; /* צבע כתום */
+      border-radius: 50%; 
+      border: 2px solid white;
+    ">
+    </div>`;
+  return L.divIcon({
+    html: iconHtml,
+    className: 'custom-pin-icon',
+    iconSize: [radius * 2, radius * 2],
+    iconAnchor: [radius, radius * 2], 
+    popupAnchor: [0, -radius]
+  });
+};
+
+
   return (
     <div className={`map-placeholder ${pinMode ? 'pin-mode' : ''}`}>  
       <ServiceContainer>
@@ -279,7 +300,7 @@ const MapContainer = () => {
               ))}
 
               {pins.map(pin => (
-                <Marker key={pin.id} position={[pin.lat, pin.lng]}>
+                <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={createPinIcon()}>
                   <Popup>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <strong>{pin.type}</strong>
