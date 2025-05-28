@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {
   getFirestore, collection, query, orderBy,
   onSnapshot, addDoc, serverTimestamp,
-  doc, getDoc, setDoc
+  doc, getDoc, setDoc, updateDoc
 } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 
@@ -26,11 +26,10 @@ function createChatId(email1, email2) {
 
 export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, otherUsername }) {
   const [chatId, setChatId] = useState(null);
-  
   const [messages, setMessages] = useState([]);
   const [newText, setNewText] = useState('');
   const bottomRef = useRef();
-    
+
   useEffect(() => {
     if (userEmail && otherEmail) {
       const id = createChatId(userEmail, otherEmail);
@@ -40,6 +39,9 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, othe
 
   useEffect(() => {
     if (!chatId) return;
+
+    // מסמנים את ההודעה האחרונה כנקראת
+    markLastMessageAsRead(chatId, userEmail);
 
     const messagesRef = collection(db, 'chats', chatId, 'messages');
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
@@ -53,13 +55,12 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, othe
     });
 
     return () => unsubscribe();
-  }, [chatId]);
+  }, [chatId, userEmail]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-   
-    
+
   const sendMessage = async () => {
     if (!newText.trim() || !chatId) return;
 
@@ -67,31 +68,59 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, othe
       const chatDocRef = doc(db, 'chats', chatId);
       const chatDoc = await getDoc(chatDocRef);
 
+      const lastMessageObj = {
+        text: newText.trim(),
+        sender: userEmail,
+        timestamp: serverTimestamp(),
+        readBy: [userEmail], // השולח כבר ראה את ההודעה
+      };
+
       if (!chatDoc.exists()) {
         await setDoc(chatDocRef, {
           participants: [userEmail, otherEmail],
           createdAt: serverTimestamp(),
-          lastMessage: newText.trim(),
-          lastSender: userEmail,
+          lastMessage: lastMessageObj,
         });
       } else {
-        await setDoc(chatDocRef, {
-          lastMessage: newText.trim(),
-          lastSender: userEmail,
+        await updateDoc(chatDocRef, {
+          lastMessage: lastMessageObj,
           updatedAt: serverTimestamp(),
-        }, { merge: true });
+        });
       }
-      
+
       const messagesRef = collection(db, 'chats', chatId, 'messages');
       await addDoc(messagesRef, {
         text: newText.trim(),
         sender_email: userEmail,
         timestamp: serverTimestamp(),
+        readBy: [userEmail], // השולח כבר ראה את ההודעה
       });
 
       setNewText('');
     } catch (error) {
       console.error('Error sending message:', error);
+    }
+  };
+
+  // פונקציה לסימון ההודעה האחרונה כנקראת ע"י המשתמש
+  const markLastMessageAsRead = async (chatId, currentUserEmail) => {
+    try {
+      const chatRef = doc(db, 'chats', chatId);
+      const chatSnap = await getDoc(chatRef);
+
+      if (!chatSnap.exists()) return;
+
+      const lastMessage = chatSnap.data().lastMessage;
+      if (!lastMessage) return;
+
+      if (!lastMessage.readBy.includes(currentUserEmail)) {
+        const updatedReadBy = [...lastMessage.readBy, currentUserEmail];
+        await updateDoc(chatRef, {
+          "lastMessage.readBy": updatedReadBy,
+        });
+      }
+    } catch (error) {
+      console.error('Error marking last message as read:', error);
     }
   };
 
@@ -108,7 +137,6 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, othe
     <Overlay onClick={onClose}>
       <Modal onClick={e => e.stopPropagation()}>
         <Header>
-            
           <Name>{otherUsername}</Name>
           <Close onClick={onClose}>✕</Close>
         </Header>
@@ -143,7 +171,7 @@ export default function ChatModal({ isOpen, onClose, userEmail, otherEmail, othe
   );
 }
 
-// Styled Components
+// Styled Components - לא שיניתי אותם
 const Overlay = styled.div`
   position: fixed;
   inset: 0;

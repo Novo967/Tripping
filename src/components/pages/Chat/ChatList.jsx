@@ -4,7 +4,7 @@ import { db } from '../../../firebase'; // או הנתיב הנכון
 import axios from 'axios';
 import styled, { createGlobalStyle } from 'styled-components';
 import ChatModal from '../Chat/ChatModal';
-
+import { doc, updateDoc } from 'firebase/firestore';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 export default function ChatList() {
@@ -12,7 +12,6 @@ export default function ChatList() {
   const [usersMap, setUsersMap] = useState({});
   const [selectedChat, setSelectedChat] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const userEmail = localStorage.getItem('userEmail');
 
   useEffect(() => {
@@ -54,10 +53,24 @@ export default function ChatList() {
     return () => unsubscribe();
   }, [userEmail]);
 
-  const handleOpenChat = (chat) => {
-    setSelectedChat(chat);
-    setModalOpen(true);
-  };
+  const handleOpenChat = async (chat) => {
+  const chatDocRef = doc(db, 'chats', chat.id);
+  
+
+  if (chat.lastSender && chat.lastSender !== userEmail) {
+    // המשתמש קורא את ההודעה - מעדכנים את השולח האחרון כמשתמש הנוכחי
+    try {
+      await updateDoc(chatDocRef, {
+        lastSender: userEmail
+      });
+    } catch (error) {
+      console.error('Error updating lastSender:', error);
+    }
+  }
+
+  setSelectedChat(chat);
+  setModalOpen(true);
+};
 
   return (
     <>
@@ -70,11 +83,13 @@ export default function ChatList() {
           const profilePicUrl = userInfo.profilePic
             ? `${SERVER_URL}/uploads/${userInfo.profilePic}`
             : `${SERVER_URL}/uploads/profile_defult_img.webp`;
-
+          
           return (
             <ChatBanner key={chat.id} onClick={() => handleOpenChat(chat)}>
               <img src={profilePicUrl} alt="Profile" />
               <span>{userInfo.username || otherEmail}</span>
+             <NewMessageDot show={chat.lastSender && chat.lastSender !== userEmail} />
+
             </ChatBanner>
           )
         })}
@@ -147,4 +162,13 @@ const ChatBanner = styled.div`
   &:hover {
     background: #fda75a; /* גוון כתום מעט כהה יותר בהובר */
   }
+`;
+const NewMessageDot = styled.div`
+  width: 10px;
+  height: 10px;
+  background-color: #007bff;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: 4px;
+  display: ${props => (props.show ? 'inline-block' : 'none')};
 `;

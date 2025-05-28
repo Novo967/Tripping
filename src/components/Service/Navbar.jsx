@@ -3,7 +3,8 @@ import { Button } from './Button';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { UserContext } from '../pages/UserSign/UserContext';
-
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase';
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const NavbarContainer = styled.nav`
@@ -141,12 +142,28 @@ const ChatIcon = styled.div`
     color: #feb47b;
   }
 `;
+const ChatIconWrapper = styled.div`
+  position: relative;
+`;
 
+const UnreadBadge = styled.span`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  font-weight: bold;
+`;
 function Navbar() {
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
   const navigate = useNavigate();
   const { username, logout } = useContext(UserContext);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const userEmail = localStorage.getItem('userEmail');
 
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
@@ -154,6 +171,27 @@ function Navbar() {
   const showButton = () => {
     setButton(window.innerWidth > 960);
   };
+useEffect(() => {
+  if (!userEmail) return;
+
+  const chatsRef = collection(db, 'chats');
+  const q = query(chatsRef, where('participants', 'array-contains', userEmail));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    let count = 0;
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.lastMessage?.sender !== userEmail && !data.lastMessage?.readBy?.includes(userEmail)) {
+        count += 1;
+      }
+    });
+
+    setUnreadCount(count);
+  });
+
+  return () => unsubscribe();
+}, [userEmail]);
 
   useEffect(() => {
     showButton();
@@ -218,10 +256,11 @@ function Navbar() {
         {button && !username && (
           <Button to='/login' buttonStyle='btn--outline'>SIGN UP</Button>
         )}
-
+        {username && (
         <ChatIcon onClick={() => navigate('/chats')} title='Chats'>
           <i className='fas fa-paper-plane' />
-        </ChatIcon>
+           {unreadCount > 0 && <UnreadBadge>{unreadCount}</UnreadBadge>}
+        </ChatIcon>)}
       </RightContainer>
     </NavbarContainer>
   );
