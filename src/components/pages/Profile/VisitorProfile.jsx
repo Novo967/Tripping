@@ -128,6 +128,7 @@ export default function VisitorProfile() {
         userEmail={localStorage.getItem('userEmail')}
         otherEmail={userData.email}
         otherId={userData.id}
+        otherUsername={userData.username}
       />
     </>
   );
