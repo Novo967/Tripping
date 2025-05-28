@@ -175,6 +175,7 @@ const Header = styled.div`
 const Name = styled.div`
   font-weight: bold;
   font-size: 1rem;
+  color: #000;
 `;
 
 const Close = styled.button`

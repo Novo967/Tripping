@@ -2,20 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../firebase'; // או הנתיב הנכון
 import axios from 'axios';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import ChatModal from '../Chat/ChatModal';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 export default function ChatList() {
   const [chats, setChats] = useState([]);
-  const [usersMap, setUsersMap] = useState({}); // מפה של אימייל -> { username, profilePic }
+  const [usersMap, setUsersMap] = useState({});
   const [selectedChat, setSelectedChat] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const userEmail = localStorage.getItem('userEmail');
 
-  // טען צ'אטים של המשתמש מ-Firebase
   useEffect(() => {
     if (!userEmail) return;
 
@@ -28,7 +27,6 @@ export default function ChatList() {
       const chatsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setChats(chatsData);
 
-      // אסוף כל האימיילים של המשתמשים האחרים בצ'אטים
       const otherEmails = new Set();
       chatsData.forEach(chat => {
         chat.participants.forEach(email => {
@@ -36,7 +34,6 @@ export default function ChatList() {
         });
       });
 
-      // טען פרטי משתמשים מהשרת Flask לפי האימיילים
       Promise.all(
         Array.from(otherEmails).map(email =>
           axios.get(`${SERVER_URL}/user_profile`, { params: { email } })
@@ -47,7 +44,7 @@ export default function ChatList() {
         const map = {};
         results.forEach(r => {
           if (r) {
-            map[r.email] = r.data; // צריך לקבל { username, profilePic } מהשרת
+            map[r.email] = r.data;
           }
         });
         setUsersMap(map);
@@ -63,45 +60,67 @@ export default function ChatList() {
   };
 
   return (
-    <Wrapper>
-      <h2>My Chats</h2>
-      {chats.map(chat => {
-        // מי המשתמש השני בצ'אט?
-        const otherEmail = chat.participants.find(email => email !== userEmail);
-        const userInfo = usersMap[otherEmail] || {};
-        const profilePicUrl = userInfo.profilePic
-          ? `${SERVER_URL}/uploads/${userInfo.profilePic}`
-          :  `${SERVER_URL}/uploads/profile_defult_img.webp`; // תמונת ברירת מחדל
+    <>
+      <GlobalStyle />
+      <Wrapper>
+        <Title>Chats</Title>
+        {chats.map(chat => {
+          const otherEmail = chat.participants.find(email => email !== userEmail);
+          const userInfo = usersMap[otherEmail] || {};
+          const profilePicUrl = userInfo.profilePic
+            ? `${SERVER_URL}/uploads/${userInfo.profilePic}`
+            : `${SERVER_URL}/uploads/profile_defult_img.webp`;
 
-        return (
-          <ChatBanner key={chat.id} onClick={() => handleOpenChat(chat)}>
-            <img src={profilePicUrl} alt="Profile" />
-            <span>{userInfo.username || otherEmail}</span>
-          </ChatBanner>
-        )
-      })}
+          return (
+            <ChatBanner key={chat.id} onClick={() => handleOpenChat(chat)}>
+              <img src={profilePicUrl} alt="Profile" />
+              <span>{userInfo.username || otherEmail}</span>
+            </ChatBanner>
+          )
+        })}
 
-      {selectedChat && (
-        <ChatModal
-          isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          userEmail={userEmail}
-          otherEmail={selectedChat.participants.find(email => email !== userEmail)}
-          chatId={selectedChat.id}
-        />
-      )}
-    </Wrapper>
+        {selectedChat && (
+          <ChatModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            userEmail={userEmail}
+            otherEmail={selectedChat.participants.find(email => email !== userEmail)}
+            chatId={selectedChat.id}
+          />
+        )}
+      </Wrapper>
+    </>
   );
 }
 
+// רקע לבן על כל העמוד
+const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+  }
+`;
+
 const Wrapper = styled.div`
-  padding: 2rem;
+  min-height: 100vh;
+  padding: 4rem 2rem 2rem 2rem;
   max-width: 600px;
-  margin: auto;
+  margin: 0 auto;
+`;
+
+const Title = styled.h1`
+  color: #000; /* כותרת בשחור */
+  font-size: 3rem;
+  padding-top: 25px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2rem;
 `;
 
 const ChatBanner = styled.div`
-  background: #f0f0f0;
+  background: #feb47b; /* כתום אופייני */
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -121,9 +140,10 @@ const ChatBanner = styled.div`
   span {
     font-size: 1.1rem;
     font-weight: bold;
+    color: #000; /* טקסט בשחור */
   }
 
   &:hover {
-    background: #e0e0e0;
+    background: #fda75a; /* גוון כתום מעט כהה יותר בהובר */
   }
 `;
