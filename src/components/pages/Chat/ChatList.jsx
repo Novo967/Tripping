@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db } from '@/firebase'; // או הנתיב הנכון
+import { db } from '../../../firebase'; // או הנתיב הנכון
 import axios from 'axios';
 import styled from 'styled-components';
 import ChatModal from '../Chat/ChatModal';
@@ -71,7 +71,7 @@ export default function ChatList() {
         const userInfo = usersMap[otherEmail] || {};
         const profilePicUrl = userInfo.profilePic
           ? `${SERVER_URL}/uploads/${userInfo.profilePic}`
-          : '/default-profile.png'; // תמונת ברירת מחדל
+          :  `${SERVER_URL}/uploads/profile_defult_img.webp`; // תמונת ברירת מחדל
 
         return (
           <ChatBanner key={chat.id} onClick={() => handleOpenChat(chat)}>

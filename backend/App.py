@@ -502,9 +502,10 @@ def get_user_chats():
         })
 
     return jsonify(chat_list), 200
-@app.route('/user_profile')
+@app.route('/user_profile', methods=["GET"])
 def get_user_profile():
     email = request.args.get('email')
+    
     if not email:
         return jsonify({'error': 'Missing email parameter'}), 400
 
@@ -513,7 +514,7 @@ def get_user_profile():
         return jsonify({'error': 'User not found'}), 404
 
     return jsonify({
-        'username': user.username,
+        'username': user.name,
         'profilePic': user.profile_pic  # שים לב לשם השדה במסד הנתונים שלך
     })
 
