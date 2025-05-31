@@ -530,12 +530,8 @@ def upload_profile_image():
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     image.save(filepath)
 
-    image_url = f"https://triping-6.onrender.com/uploads/{filename}"  # לדוגמה
+    return jsonify({'url': f'/uploads/{filename}'})
 
-    # עדכון במסד הנתונים שלך לפי סוג התמונה:
-  
-
-    return jsonify({'url': image_url})
 
 # Run the app
 if __name__ == '__main__':
