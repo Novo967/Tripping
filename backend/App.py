@@ -517,7 +517,30 @@ def get_user_profile():
         'username': user.name,
         'profilePic': user.profile_pic  # שים לב לשם השדה במסד הנתונים שלך
     })
+@app.route('/upload-profile-image', methods=['POST'])
+def upload_profile_image():
+    uid = request.form.get('uid')
+    image_type = request.form.get('type')  # 'profile' or 'gallery'
+    image = request.files.get('image')
 
+    if not uid or not image:
+        return jsonify({'error': 'Missing data'}), 400
+
+    filename = secure_filename(f"{uid}_{image.filename}")
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    image.save(filepath)
+
+    image_url = f"https://triping-6.onrender.com/uploads/{filename}"  # לדוגמה
+
+    # עדכון במסד הנתונים שלך לפי סוג התמונה:
+    if image_type == 'profile':
+        # update profile_pic column
+        ...
+    else:
+        # insert into gallery table
+        ...
+
+    return jsonify({'url': image_url})
 
 # Run the app
 if __name__ == '__main__':
