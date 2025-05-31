@@ -530,7 +530,7 @@ def upload_profile_image():
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     image.save(filepath)
 
-    image_url = "https://triping-6.onrender.com/uploads/{filename}"  # לדוגמה
+    image_url = f"https://triping-6.onrender.com/uploads/{filename}"  # לדוגמה
 
     # עדכון במסד הנתונים שלך לפי סוג התמונה:
   
